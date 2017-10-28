@@ -38,6 +38,10 @@ Electron は非常に便利なモノではあるが、造りが Web ブラウザ
 ## 言語構文
 
 ```json
+{ "&": "*", "*": [ "console", "log", { "Hello, &A!" } ] }
+```
+
+```json
 {
     "&": "call",
     "target": {
