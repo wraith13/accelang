@@ -1,0 +1,122 @@
+/*
+    overview layout
+*/
+body
+{
+    margin: 0px;
+    padding: 0px;
+    overflow-x: hidden;
+}
+header,
+#body,
+footer
+{
+    width: 100vw;
+    white-space: nowrap;
+}
+.container
+{
+    margin: 0 auto;
+    padding: 0px @container-width-padding;
+    max-width: @container-max-width;
+}
+header
+{
+    height: calc(@header-out-height - (@header-height-padding * 2));
+    line-height: calc(@header-out-height - (@header-height-padding * 2));
+    padding-top: @header-height-padding;
+    padding-bottom: @header-height-padding;
+}
+#body
+{
+    margin: -@header-out-height auto -@footer-out-height auto;
+    min-height: 100vh;
+    .container
+    {
+        padding-top: (@header-out-height + @body-height-padding);
+        padding-bottom: (@footer-out-height + @body-height-padding);
+    }
+}
+footer
+{
+    margin-top: -@footer-out-height;
+    height: calc(@footer-out-height - (@footer-height-padding * 2));
+    line-height: calc(@footer-out-height - (@footer-height-padding * 2));
+    padding-top: @footer-height-padding;
+    padding-bottom: @footer-height-padding;
+}
+
+/*
+    global theme
+*/
+body
+{
+    color: @main-color;
+    background-color: @base-color;
+    font-family: @font-family;
+}
+a
+{
+    color: @default-link-color;
+    &:hover
+    {
+        color: @default-link-hover-color;
+    }
+}
+ul
+{
+    margin: 0px 0.5rem;
+    padding: 0px;
+    list-style-position: inside;
+}
+
+/*
+    header
+*/
+header
+{
+    color: @base-color;
+    background-color: @main-color;
+    font-size: 1.3rem;
+}
+
+/*
+    body
+*/
+
+/*
+    footer
+*/
+footer
+{
+    color: @footer-main-color;
+    background-color: @footer-base-color;
+    font-size: 0.8rem;
+    ul
+    {
+        display: block;
+        margin: 0px;
+        padding: 0px;
+        list-style-type: none;
+        li
+        {
+            display: inline;
+            &:not(:first-child)::before
+            {
+                content: @footer-separator-content;
+                color: @footer-separator-color;
+                margin-left: @footer-separator-margin;
+                margin-right: @footer-separator-margin;
+            }
+        }
+    }
+    a
+    {
+        color: @footer-accent-color;
+        text-decoration: none;
+        &:hover
+        {
+            text-decoration: underline;
+        }
+    }
+}
