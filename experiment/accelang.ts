@@ -1,1 +1,1 @@
-document.getElementById("body").innerHTML = "TypeScript worked.";
+document.getElementById("body").getElementsByClassName("container")[0].innerHTML = "TypeScript worked.";
