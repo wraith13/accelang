@@ -1,5 +1,5 @@
 //  copy from https://stackoverflow.com/questions/36532307/rem-px-in-javascript
-function convertRemToPixels(rem)
+function convertRemToPixels(rem : number) :number
 {
     return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
 }
@@ -19,9 +19,7 @@ function fill_height() : void
 {
     const list = [
         document.getElementsByTagName("textarea")[0],
-        //  なぜか Cast の構文がインタプリタで利用できない。。。
-        //<HTMLElement>document.getElementsByClassName("xxx")[0]
-        document.getElementsByClassName("xxx")[0]
+        <HTMLElement>document.getElementsByClassName("xxx")[0]
     ];
     if (convertRemToPixels(80) <= document.body.clientWidth)
     {
