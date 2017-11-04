@@ -1,2 +1,45 @@
 @import "params.less";
 @import "template.less";
+
+#body > .container > .pane
+{
+    width: 100vw;
+    padding: 0.25rem;
+    & > .title
+    {
+        line-height: 1.0rem;
+    }
+    & > .container
+    {
+        & > .xxx
+        {
+            background-color: gray;
+        }
+    }
+}
+
+@media (min-width:80rem)
+{
+    #body > .container
+    {
+        display: flex;
+        & > .pane
+        {
+            width: auto;
+            margin: 0rem 0.25rem;
+            padding: 0rem;
+            &.sample-list
+            {
+                flex-grow: 1;
+            }
+            &.source
+            {
+                flex-grow: 4;
+            }
+            &.output
+            {
+                flex-grow: 4;
+            }
+        }
+    }
+}

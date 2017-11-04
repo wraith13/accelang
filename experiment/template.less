@@ -13,12 +13,12 @@ footer
 {
     width: 100vw;
     white-space: nowrap;
-}
-.container
-{
-    margin: 0 auto;
-    padding: 0px @container-width-padding;
-    max-width: @container-max-width;
+    & > .container
+    {
+        margin: 0 auto;
+        padding: 0px @container-width-padding;
+        max-width: @container-max-width;
+    }
 }
 header
 {
@@ -31,7 +31,7 @@ header
 {
     margin: -@header-out-height auto -@footer-out-height auto;
     min-height: 100vh;
-    .container
+    & > .container
     {
         padding-top: (@header-out-height + @body-height-padding);
         padding-bottom: (@footer-out-height + @body-height-padding);
@@ -92,13 +92,13 @@ footer
     color: @footer-main-color;
     background-color: @footer-base-color;
     font-size: 0.8rem;
-    ul
+    & > .container > ul
     {
         display: block;
         margin: 0px;
         padding: 0px;
         list-style-type: none;
-        li
+        & > li
         {
             display: inline;
             &:not(:first-child)::before
@@ -110,7 +110,7 @@ footer
             }
         }
     }
-    a
+    & > .container a
     {
         color: @footer-accent-color;
         text-decoration: none;

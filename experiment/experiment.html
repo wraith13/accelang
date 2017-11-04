@@ -6,6 +6,7 @@
     <link rel="stylesheet/less" type="text/css" href="./index.less" />
     <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
     <script type="text/typescript" src="accelang.ts"></script>
+    <script type="text/typescript" src="experiment.ts"></script>
     <script src="https://rawgit.com/Microsoft/TypeScript/master/lib/typescriptServices.js"></script>
     <script src="https://rawgit.com/basarat/typescript-script/master/transpiler.js"></script>
 </head>
@@ -14,6 +15,24 @@
     <div id="body">
         <div class="container">
             <noscript>Enable JavaScript. This page requires JavaScript.</noscript>
+            <div class="pane sample-list">
+                <div class="title">samples</div>
+                <div class="container">
+                    <ul></ul>
+                </div>
+            </div>
+            <div class="pane source">
+                <div class="title">source code</div>
+                <div class="container">
+                    <textarea id="source" class="fill-height" placeholder="samples から選択してください。"></textarea>
+                </div>
+            </div>
+            <div class="pane output">
+                <div class="title">output</div>
+                <div class="container">
+                    <div class="xxx fill-height"></div>
+                </div>
+            </div>
         </div>
     </div>
     <footer><div class="container">
