@@ -1,3 +1,5 @@
+'use strict';
+
 //  copy from https://stackoverflow.com/questions/36532307/rem-px-in-javascript
 function convertRemToPixels(rem : number) :number
 {
@@ -8,7 +10,16 @@ setTimeout
 (
     () =>
     {
-        document.getElementsByClassName("sample-list")[0].getElementsByClassName("container")[0].getElementsByTagName("ul")[0].innerHTML = "<li>item</li>";
+        var request = window.ActiveXObject ? new window.ActiveXObject('Microsoft.XMLHTTP') : new window.XMLHttpRequest();
+        request.open('GET', "samples.json", true);
+        request.onreadystatechange = () =>
+        {
+            if (4 === request.readyState && 200 === request.status)
+            {
+                document.getElementsByClassName("sample-list")[0].getElementsByClassName("container")[0].getElementsByTagName("ul")[0].innerHTML = JSON.parse(request.responseText).map(i => `<li>${i.name}</li>`).join("");
+            }
+        };
+        request.send(null);
         fill_height();
         window.onresize = fill_height;
     },
