@@ -6,20 +6,35 @@ function convertRemToPixels(rem : number) :number
     return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
 }
 
+function http_get(url : string, callback : (response_body : string)=>void) :void
+{
+    var request = window.ActiveXObject ? new window.ActiveXObject('Microsoft.XMLHTTP') : new window.XMLHttpRequest();
+    request.open('GET', url, true);
+    request.onreadystatechange = () =>
+    {
+        if (4 === request.readyState && 200 === request.status)
+        {
+            callback(request.responseText);
+        }
+    };
+    request.send(null);
+}
+
 setTimeout
 (
     () =>
     {
-        var request = window.ActiveXObject ? new window.ActiveXObject('Microsoft.XMLHTTP') : new window.XMLHttpRequest();
-        request.open('GET', "samples.json", true);
-        request.onreadystatechange = () =>
-        {
-            if (4 === request.readyState && 200 === request.status)
-            {
-                document.getElementsByClassName("sample-list")[0].getElementsByClassName("container")[0].getElementsByTagName("ul")[0].innerHTML = JSON.parse(request.responseText).map(i => `<li>${i.name}</li>`).join("");
-            }
-        };
-        request.send(null);
+        http_get
+        (
+            "samples/index.json",
+            samples => document
+                .getElementsByClassName("sample-list")[0]
+                .getElementsByClassName("container")[0]
+                .getElementsByTagName("ul")[0].innerHTML = 
+                    JSON.parse(samples)
+                    .map(i => `<li>${i.name}</li>`)
+                    .join("")
+        );
         fill_height();
         window.onresize = fill_height;
     },
