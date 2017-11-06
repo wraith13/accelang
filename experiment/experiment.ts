@@ -32,7 +32,7 @@ setTimeout
                 .getElementsByClassName("container")[0]
                 .getElementsByTagName("ul")[0].innerHTML = 
                     JSON.parse(samples)
-                    .map(i => `<li>${i.name}</li>`)
+                    .map(i => `<li onclick=select('${i.url}')>${i.name}</li>`)
                     .join("")
         );
         fill_height();
@@ -57,4 +57,13 @@ function fill_height() : void
         list.forEach(element => element.style.width = (document.body.clientWidth -convertRemToPixels(1)) +"px");
         list.forEach(element => element.style.height = "30vh");
     }
+}
+
+function select(url : string) : void
+{
+    http_get
+    (
+        url,
+        sample => document.getElementsByTagName("textarea")[0].value = sample
+    );
 }
