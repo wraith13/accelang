@@ -1,6 +1,6 @@
 {
-    "&comment": "Sample code: Hello, &A!",
-    "&a": "call",
-    "target": { "&a": "member", "object": "console", "member": "log" },
-    "argument":{ "&a": "literal", "value": "Hello, &A!" }
+    "&Comment": "Sample code: Hello, &A!",
+    "&A": "call",
+    "target": { "&A": "member", "object": "console", "member": "log" },
+    "argument":{ "&A": "literal", "value": "Hello, &A!" }
 }

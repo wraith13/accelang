@@ -1,0 +1,99 @@
+[
+    {
+        "&A": "*",
+        "&Comment":"any"
+    },
+    {
+        "&A": "code",
+        "base_type": "*"
+    },
+    {
+        "&A": "call",
+        "base_type": "code",
+        "target":["function","procedure"],
+        "argument":"any"
+    },
+    {
+        "&A": "member",
+        "base_type": "*",
+        "object":"object",
+        "member":"string"
+    },
+    {
+        "&A": "literal",
+        "value": "string"
+    },
+    {
+        "&A": "if",
+        "condition": "bool",
+        "then": ["code",null],
+        "else": ["code",null]
+    },
+    {
+        "&A": "switch",
+        "condition": "any",
+        "case":
+        {
+            "&A":"array",
+            "type":
+            {
+                "&A":"case",
+                "argument":
+                {
+                    "&A":"call",
+                    "target":"typeof",
+                    "argument":
+                    {
+                        "&A": "member",
+                        "object": "this",
+                        "member": "condition"
+                    }
+                }
+            }
+        },
+        "default": "code"
+    },
+    {
+        "&A":
+        {
+            "&a":"case",
+            "argument": {
+                "&A": "argument",
+                "type":"type",
+                "name":"type"
+            }
+        },
+        "condition": "bool",
+        "code": "code"
+    },
+    {
+        "&A": "function",
+        "argument":{ "&A":"array", "argument":"argument" },
+        "return_type":"type",
+        "code": "code"
+    },
+    {
+        "&A": "procedure",
+        "argument":{ "&A":"array", "argument":"argument" },
+        "return_type":"type",
+        "code": "code"
+    },
+    {
+        "&A":
+        {
+            "&a":"array",
+            "argument": {
+                "&A": "argument",
+                "type":"type",
+                "name":"type"
+            }
+        },
+        "base_type": "type",
+        "type":"type"
+    },
+    {
+        "&A": "argument",
+        "type":"type",
+        "name":"string"
+    }
+]
