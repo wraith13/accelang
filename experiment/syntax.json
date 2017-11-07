@@ -21,21 +21,24 @@
     },
     {
         "&A": "literal",
+        "base_type": "*",
         "value": "string"
     },
     {
         "&A": "if",
+        "base_type": "*",
         "condition": "bool",
         "then": ["code",null],
         "else": ["code",null]
     },
     {
         "&A": "switch",
+        "base_type": "*",
         "condition": "any",
         "case":
         {
             "&A":"array",
-            "type":
+            "argument":
             {
                 "&A":"case",
                 "argument":
@@ -65,6 +68,12 @@
         },
         "condition": "bool",
         "code": "code"
+    },
+    {
+        "&A": "while",
+        "base_type": "*",
+        "condition": "bool",
+        "code": ["code",null]
     },
     {
         "&A": "function",
