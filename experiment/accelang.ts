@@ -2,11 +2,46 @@
 
 var accelang = accelang ||
 {
-    "run": (code : object, output : (text : string)=>void ) : void =>
+    "&A": "interpreter-implement",
+    "log": (text : string) : void => console.log(text),
+    "error": (text : string) : void => console.error(text),
+    
+    "run": (code : object) : void =>
     {
-        if (!code || !code["&a"])
+        accelang.eval(code);
+    },
+    "eval": (code : object) : any =>
+    {
+        if (null === code)
         {
-            output("format error");
+            return null;
         }
-    } 
+        const type = code["&a"];
+        if (undefined === type || null === type)
+        {
+            accelang.error("format error(missing type)");
+        }
+        else
+        {
+            switch(typeof(type))
+            {
+            case "string":
+                switch(type)
+                {
+                default:
+                    accelang.error(`uknown type error: ${type}`);
+                }
+                break;
+                
+            case "object":
+                {
+                    //const complex_type = accelang.eval(type);
+                    break;
+                }
+
+            default:
+                accelang.error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`);
+            }
+        }
+    }
 };
