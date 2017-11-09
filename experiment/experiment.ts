@@ -6,6 +6,35 @@ function convertRemToPixels(rem : number) :number
     return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
 }
 
+function getSourcodeElement() : HTMLTextAreaElement
+{
+    return <HTMLTextAreaElement>document.getElementsByTagName("textarea")[0];
+}
+function getOutputElement() : HTMLElement
+{
+    return <HTMLElement>document.getElementsByClassName("xxx")[0];
+}
+
+class CreateElementArg
+{
+    tag : string;
+    className ?: string;
+    innerText ?: string;
+}
+function createElement(arg : CreateElementArg) : HTMLElement
+{
+    const element = document.createElement(arg.tag);
+    if (undefined !== arg.className)
+    {
+        element.className = arg.className;
+    }
+    if (undefined !== arg.innerText)
+    {
+        element.innerText = arg.innerText;
+    }
+    return element;
+}
+
 function http_get(url : string, callback : (response_body : string)=>void) :void
 {
     var request = window.ActiveXObject ? new window.ActiveXObject('Microsoft.XMLHTTP') : new window.XMLHttpRequest();
@@ -37,6 +66,7 @@ setTimeout
         );
         fill_height();
         window.onresize = fill_height;
+        (<HTMLElement>document.getElementsByClassName("run")[0]).onclick = run;
     },
     10
 );
@@ -44,8 +74,8 @@ setTimeout
 function fill_height() : void
 {
     const list = [
-        document.getElementsByTagName("textarea")[0],
-        <HTMLElement>document.getElementsByClassName("xxx")[0]
+        getSourcodeElement(),
+        getOutputElement()
     ];
     if (convertRemToPixels(80) <= document.body.clientWidth)
     {
@@ -64,6 +94,47 @@ function select(url : string) : void
     http_get
     (
         url,
-        sample => document.getElementsByTagName("textarea")[0].value = sample
+        sample => getSourcodeElement().value = sample
     );
+}
+
+function run() : void
+{
+    getOutputElement().innerHTML = "";
+    accelang.log = (text : string) : void =>
+    {
+        getOutputElement().appendChild
+        (
+            createElement
+            (
+                {
+                    tag:"div",
+                    className:"log",
+                    innerText:text
+                }
+            )
+        );
+    };
+    accelang.error = (text : string) : void =>
+    {
+        getOutputElement().appendChild
+        (
+            createElement
+            (
+                {
+                    tag:"div",
+                    className:"error",
+                    innerText:text
+                }
+            )
+        );
+    };
+    try
+    {
+        accelang.eval(JSON.parse(getSourcodeElement().value));
+    }
+    catch(error)
+    {
+        accelang.error(JSON.stringify(error));
+    }
 }

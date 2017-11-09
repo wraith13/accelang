@@ -8,12 +8,33 @@
     & > .title
     {
         line-height: 1.0rem;
+        & > .run
+        {
+            margin-top: -1.0rem;
+            float:right;
+            cursor: pointer;
+        }
     }
     & > .container
     {
         & > .xxx
         {
-            background-color: gray;
+            background-color: #DEFEEE;
+
+            & > .error
+            {
+                color: #E04040;
+            }
+        }
+    }
+    &.sample-list
+    {
+        & > .container
+        {
+            & > ul > li
+            {
+                cursor: pointer;
+            }
         }
     }
 }
