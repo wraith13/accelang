@@ -6,10 +6,6 @@ var accelang = accelang ||
     "log": (text : string) : void => console.log(text),
     "error": (text : string) : void => console.error(text),
     
-    "run": (code : object) : void =>
-    {
-        accelang.eval(code);
-    },
     "eval": (code : object) : any =>
     {
         if (null === code)
