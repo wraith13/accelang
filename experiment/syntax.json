@@ -59,7 +59,7 @@
     {
         "&A":
         {
-            "&a":"case",
+            "&A":"case",
             "argument": {
                 "&A": "argument",
                 "type":"type",
@@ -90,7 +90,7 @@
     {
         "&A":
         {
-            "&a":"array",
+            "&A":"array",
             "argument": {
                 "&A": "argument",
                 "type":"type",

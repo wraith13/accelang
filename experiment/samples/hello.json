@@ -1,6 +1,7 @@
 {
     "&Comment": "Sample code: Hello, &A!",
     "&A": "call",
+    "require": [{ "&A": "package", "target":["system","console"] }],
     "target": { "&A": "member", "object": "console", "member": "log" },
     "argument":{ "&A": "literal", "value": "Hello, &A!" }
 }
