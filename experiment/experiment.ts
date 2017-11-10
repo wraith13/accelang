@@ -131,7 +131,18 @@ function run() : void
     };
     try
     {
-        accelang.eval(JSON.parse(getSourcodeElement().value));
+        accelang.log
+        (
+            JSON.stringify
+            (
+                accelang.eval
+                (
+                    JSON.parse(getSourcodeElement().value)
+                ),
+                null,
+                4
+            )
+        );
     }
     catch(error)
     {

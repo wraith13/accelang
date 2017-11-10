@@ -5,6 +5,15 @@ var accelang = accelang ||
     "&A": "interpreter-implement",
     "log": (text : string) : void => console.log(text),
     "error": (text : string) : void => console.error(text),
+
+    "make_error": (message : string) : object =>
+    {
+        accelang.error(message);
+        return {
+            "&A": "error",
+            "message":message,
+        };
+    },
     
     "eval": (code : object) : any =>
     {
@@ -15,7 +24,7 @@ var accelang = accelang ||
         const type = code["&a"];
         if (undefined === type || null === type)
         {
-            accelang.error("format error(missing type)");
+            return accelang.make_error("format error(missing type)");
         }
         else
         {
@@ -25,9 +34,8 @@ var accelang = accelang ||
                 switch(type)
                 {
                 default:
-                    accelang.error(`uknown type error: ${type}`);
+                    return accelang.make_error(`uknown type error: ${type}`);
                 }
-                break;
                 
             case "object":
                 {
@@ -36,8 +44,9 @@ var accelang = accelang ||
                 }
 
             default:
-                accelang.error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`);
+                return accelang.make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`);
             }
         }
+        return accelang.make_error("intenal error");
     }
 };
