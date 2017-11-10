@@ -10,7 +10,9 @@
         line-height: 1.0rem;
         & > .run
         {
-            margin-top: -1.0rem;
+            @-moz-document url-prefix() {
+                margin-top: -1.0rem;
+            }
             float:right;
             cursor: pointer;
         }
