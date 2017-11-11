@@ -135,7 +135,7 @@ function run() : void
         (
             JSON.stringify
             (
-                accelang.eval
+                accelang.evaluate
                 (
                     JSON.parse(getSourcodeElement().value)
                 ),

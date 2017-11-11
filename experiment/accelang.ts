@@ -1,21 +1,20 @@
 'use strict';
 
-var accelang = accelang ||
+module accelang
 {
-    "&A": "interpreter-implement",
-    "log": (text : string) : void => console.log(text),
-    "error": (text : string) : void => console.error(text),
+    export var log : (text : string) => void = (text : string) => console.log(text);
+    export var error : (text : string) => void = (text : string) => console.error(text);
 
-    "make_error": (message : string) : object =>
+    function make_error(message : string) : object
     {
         accelang.error(message);
         return {
             "&A": "error",
             "message":message,
         };
-    },
+    }
     
-    "eval": (code : object) : any =>
+    export function evaluate(code : object) : any
     {
         if (null === code)
         {
@@ -24,7 +23,7 @@ var accelang = accelang ||
         const type = code["&a"];
         if (undefined === type || null === type)
         {
-            return accelang.make_error("format error(missing type)");
+            return make_error("format error(missing type)");
         }
         else
         {
@@ -34,19 +33,19 @@ var accelang = accelang ||
                 switch(type)
                 {
                 default:
-                    return accelang.make_error(`uknown type error: ${type}`);
+                    return make_error(`uknown type error: ${type}`);
                 }
                 
             case "object":
                 {
-                    //const complex_type = accelang.eval(type);
+                    //const complex_type = accelang.evaluate(type);
                     break;
                 }
 
             default:
-                return accelang.make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`);
+                return make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`);
             }
         }
-        return accelang.make_error("intenal error");
+        return make_error("intenal error");
     }
-};
+}
