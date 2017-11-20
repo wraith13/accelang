@@ -37,7 +37,8 @@ function createElement(arg : CreateElementArg) : HTMLElement
 
 function http_get(url : string, callback : (response_body : string)=>void) :void
 {
-    var request = window.ActiveXObject ? new window.ActiveXObject('Microsoft.XMLHTTP') : new window.XMLHttpRequest();
+    var request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
+
     request.open('GET', url, true);
     request.onreadystatechange = () =>
     {
