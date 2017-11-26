@@ -77,15 +77,19 @@
     },
     {
         "&A": "function",
+        "name": "string",
         "argument":{ "&A":"array", "argument":"argument" },
         "return_type":"type",
-        "code": "code"
+        "code": "code",
+        "&implement": "any"
     },
     {
         "&A": "procedure",
+        "name": "string",
         "argument":{ "&A":"array", "argument":"argument" },
         "return_type":"type",
-        "code": "code"
+        "code": "code",
+        "&implement": "any"
     },
     {
         "&A":
@@ -104,5 +108,11 @@
         "&A": "argument",
         "type":"type",
         "name":"string"
+    },
+    {
+        "&A":"report",
+        "base_type": "*",
+        "conclusion":"any",
+        "statement":"any"
     }
 ]
