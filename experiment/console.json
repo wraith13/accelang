@@ -1,0 +1,26 @@
+[
+    {
+        "&A": "procedure",
+        "name": "log",
+        "argument":{
+            "&A": "argument",
+            "type":{ "&A": "type", "name":"string" },
+            "name":"text"
+        },
+        "return_type":{ "&A": "type", "name":"void" },
+        "code": null,
+        "&implement": "console.log"
+    },
+    {
+        "&A": "procedure",
+        "name": "error",
+        "argument":{
+            "&A": "argument",
+            "type":{ "&A": "type", "name":"string" },
+            "name":"text"
+        },
+        "return_type":{ "&A": "type", "name":"void" },
+        "code": "code",
+        "&implement": "console.error"
+    }
+]
