@@ -1,7 +1,14 @@
 {
     "&Comment": "Sample code: Hello, &A!",
     "&A": "call",
-    "require": [{ "&A": "package", "target":["system","console"] }],
+    "require":
+    [
+        {
+            "&A": "package",
+            "target":["ground","console"],
+            "version": { "major":"0", "minor":"00", "build":"000" }
+        }
+    ],
     "target": { "&A": "member", "object": "console", "member": "log" },
     "argument":{ "&A": "literal", "value": "Hello, &A!" }
 }
