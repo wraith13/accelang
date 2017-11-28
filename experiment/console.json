@@ -20,7 +20,7 @@
             "name":"text"
         },
         "return_type":{ "&A": "type", "name":"void" },
-        "code": "code",
+        "code": null,
         "&implement": "console.error"
     }
 ]
