@@ -5,6 +5,16 @@ module accelang
     export var log : (text : string) => void = (text : string) => console.log(text);
     export var error : (text : string) => void = (text : string) => console.error(text);
 
+    class Context
+    {
+        code :object;
+        cache : object[];
+        statement : object[];
+        profiling : object[];
+        footstamp : object[];
+        coverage : object[];
+    }
+
     function make_error(message : string) : object
     {
         accelang.error(message);
@@ -61,7 +71,7 @@ module accelang
         return make_error("intenal error");
     }
     
-    export function evaluate(code : object, context : object = null) : any
+    export function evaluate(code : object, context : Context = null) : any
     {
         if (null === code)
         {
@@ -69,14 +79,13 @@ module accelang
         }
         if (null === context)
         {
-            context = {
-                "code": code = load(code),
-                "cache": [],
-                "statement": [],
-                "profiling": [],
-                "footstamp": [],
-                "coverage": []
-            };
+            context = new Context();
+            context.code = code = load(code);
+            context.cache = [];
+            context.statement = [];
+            context.profiling = [];
+            context.footstamp = [];
+            context.coverage = [];
         }
         const type = code["&A"];
         if (undefined === type || null === type)
