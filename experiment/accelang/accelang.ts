@@ -69,7 +69,14 @@ module accelang
         }
         if (null === context)
         {
-            code = context = load(code);
+            context = {
+                "code": code = load(code),
+                "cache": [],
+                "statement": [],
+                "profiling": [],
+                "footstamp": [],
+                "coverage": []
+            };
         }
         const type = code["&A"];
         if (undefined === type || null === type)
