@@ -5,7 +5,7 @@ module accelang
     export var log : (text : string) => void = (text : string) => console.log(text);
     export var error : (text : string) => void = (text : string) => console.error(text);
 
-    class Context
+    class Context // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
     {
         code :object;
         cache : object[];
@@ -32,6 +32,16 @@ module accelang
 //        
 //    }
 
+    export function preload(code : object) : any
+    {
+        //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
+        return load(code);
+    }
+    export function preprocess(code : object, _context : Context = null) : any
+    {
+        return code;
+    }
+
     export function load(code : object) : any
     {
         //  この関数の役割は全てのコードおよびデータをコードからアクセス可能な状態にすること。
@@ -54,6 +64,9 @@ module accelang
 //                case "call":
 //                    return call(code, context);
 
+                case "error":
+                    return code;
+
                 default:
                     return make_error(`uknown type error: ${type}`);
                 }
@@ -70,7 +83,7 @@ module accelang
         }
         return make_error("intenal error");
     }
-    
+
     export function evaluate(code : object, context : Context = null) : any
     {
         if (null === code)
@@ -80,12 +93,12 @@ module accelang
         if (null === context)
         {
             context = new Context();
-            context.code = code = load(code);
             context.cache = [];
             context.statement = [];
             context.profiling = [];
             context.footstamp = [];
             context.coverage = [];
+            context.code = load(preprocess(preload(code), context));
         }
         const type = code["&A"];
         if (undefined === type || null === type)
@@ -101,6 +114,9 @@ module accelang
                 {
 //                case "call":
 //                    return call(code, context);
+
+                case "error":
+                    return code;
 
                 default:
                     return make_error(`uknown type error: ${type}`);
