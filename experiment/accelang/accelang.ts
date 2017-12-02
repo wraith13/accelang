@@ -15,12 +15,13 @@ module accelang
         coverage : object[];
     }
 
-    function make_error(message : string) : object
+    function make_error(message : string, code : object = null) : object
     {
         accelang.error(message);
         return {
             "&A": "error",
             "message":message,
+            "code": code
         };
     }
     
@@ -52,7 +53,7 @@ module accelang
         const type = code["&A"];
         if (undefined === type || null === type)
         {
-            return make_error("format error(missing type)");
+            return make_error("format error(missing type)", code);
         }
         else
         {
@@ -68,7 +69,7 @@ module accelang
                     return code;
 
                 default:
-                    return make_error(`uknown type error: ${type}`);
+                    return make_error(`uknown type error: ${type}`, code);
                 }
                 
             case "object":
@@ -78,10 +79,10 @@ module accelang
                 }
 
             default:
-                return make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`);
+                return make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
             }
         }
-        return make_error("intenal error");
+        return make_error("intenal error", code);
     }
 
     export function evaluate(code : object, context : Context = null) : any
@@ -98,12 +99,12 @@ module accelang
             context.profiling = [];
             context.footstamp = [];
             context.coverage = [];
-            context.code = load(preprocess(preload(code), context));
+            context.code = code = load(preprocess(preload(code), context));
         }
         const type = code["&A"];
         if (undefined === type || null === type)
         {
-            return make_error("format error(missing type)");
+            return make_error("format error(missing type)", code);
         }
         else
         {
@@ -119,7 +120,7 @@ module accelang
                     return code;
 
                 default:
-                    return make_error(`uknown type error: ${type}`);
+                    return make_error(`uknown type error: ${type}`, code);
                 }
                 
             case "object":
@@ -129,9 +130,9 @@ module accelang
                 }
 
             default:
-                return make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`);
+                return make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
             }
         }
-        return make_error("intenal error");
+        return make_error("intenal error", code);
     }
 }
