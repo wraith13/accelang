@@ -2,6 +2,21 @@
 
 module accelang
 {
+    export function http_get(url : string, callback : (response_body : string)=>void) :void
+    {
+        var request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
+    
+        request.open('GET', url, true);
+        request.onreadystatechange = () =>
+        {
+            if (4 === request.readyState && 200 === request.status)
+            {
+                callback(request.responseText);
+            }
+        };
+        request.send(null);
+    }
+        
     export var log : (text : string) => void = (text : string) => console.log(text);
     export var error : (text : string) => void = (text : string) => console.error(text);
 

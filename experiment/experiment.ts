@@ -35,26 +35,11 @@ function createElement(arg : CreateElementArg) : HTMLElement
     return element;
 }
 
-function http_get(url : string, callback : (response_body : string)=>void) :void
-{
-    var request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
-
-    request.open('GET', url, true);
-    request.onreadystatechange = () =>
-    {
-        if (4 === request.readyState && 200 === request.status)
-        {
-            callback(request.responseText);
-        }
-    };
-    request.send(null);
-}
-
 setTimeout
 (
     () =>
     {
-        http_get
+        accelang.http_get
         (
             "samples/index.json",
             samples => document
@@ -92,7 +77,7 @@ function fill_height() : void
 
 function select(url : string) : void
 {
-    http_get
+    accelang.http_get
     (
         url,
         sample => getSourcodeElement().value = sample
