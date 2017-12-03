@@ -5,9 +5,9 @@ module accelang
     export var log : (text : string) => void = (text : string) => console.log(text);
     export var error : (text : string) => void = (text : string) => console.error(text);
 
-    class Context // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
+    class AmpContext // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
     {
-        code :object;
+        code : object;
         cache : object[];
         statement : object[];
         profiling : object[];
@@ -38,7 +38,7 @@ module accelang
         //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
         return load(code);
     }
-    export function preprocess(code : object, _context : Context = null) : any
+    export function preprocess(code : object, _context : AmpContext = null) : any
     {
         return code;
     }
@@ -50,10 +50,11 @@ module accelang
         //  エラーを検出しても可能な限り最後まで処理を行う。
         //  この関数では例えそれが定数であっても評価は一切しない。(というかこの関数の処理が完了するまでは定数を評価する為に必要なコードやデータがアクセス可能な状態になっている保証がない。)
 
+        var result = { };
         const type = code["&A"];
         if (undefined === type || null === type)
         {
-            return make_error("format error(missing type)", code);
+            result = make_error("format error(missing type)", code);
         }
         else
         {
@@ -66,11 +67,13 @@ module accelang
 //                    return call(code, context);
 
                 case "error":
-                    return code;
+                    result = code;
+                    break;
 
                 default:
-                    return make_error(`uknown type error: ${type}`, code);
+                    result = make_error(`uknown type error: ${type}`, code);
                 }
+                break;
                 
             case "object":
                 {
@@ -79,13 +82,13 @@ module accelang
                 }
 
             default:
-                return make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
+                result = make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
             }
         }
-        return make_error("intenal error", code);
+        return result;
     }
 
-    export function evaluate(code : object, context : Context = null) : any
+    export function evaluate(code : object, context : AmpContext = null) : any
     {
         if (null === code)
         {
@@ -93,7 +96,7 @@ module accelang
         }
         if (null === context)
         {
-            context = new Context();
+            context = new AmpContext();
             context.cache = [];
             context.statement = [];
             context.profiling = [];
