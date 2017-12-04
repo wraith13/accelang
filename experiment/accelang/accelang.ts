@@ -19,7 +19,7 @@ module accelang
         
     export var log : (text : string) => void = (text : string) => console.log(text);
     export var error : (text : string) => void = (text : string) => console.error(text);
-/*
+
     class AmpVersion
     {
         major : string;
@@ -31,16 +31,38 @@ module accelang
         name : string;
         version : AmpVersion;
         url : string;
+
+        get(callback : (code : object)=>void) :void
+        {
+            http_get
+            (
+                this.url,
+                (response_body) => callback(JSON.parse(response_body))
+            );
+        }
+        
     }
-*/
+
     class AmpContext // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
     {
-        code : object;
+        code : object[];
         cache : object[];
         statement : object[];
         profiling : object[];
         footstamp : object[];
         coverage : object[];
+
+        get(pack : AmpPackage) : void
+        {
+            pack.get
+            (
+                code => load(code)
+            );
+        }
+        load(code : object) : void
+        {
+            this.code.push(load(preprocess(preload(code), this)));
+        }
     }
 
     function make_error(message : string, code : object = null) : object
@@ -125,12 +147,14 @@ module accelang
         if (null === context)
         {
             context = new AmpContext();
+            context.code = [];
             context.cache = [];
             context.statement = [];
             context.profiling = [];
             context.footstamp = [];
             context.coverage = [];
-            context.code = code = load(preprocess(preload(code), context));
+            context.load(code);
+            code = context.code;
         }
         const type = code["&A"];
         if (undefined === type || null === type)
