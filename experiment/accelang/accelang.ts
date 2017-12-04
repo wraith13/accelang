@@ -19,7 +19,20 @@ module accelang
         
     export var log : (text : string) => void = (text : string) => console.log(text);
     export var error : (text : string) => void = (text : string) => console.error(text);
-
+/*
+    class AmpVersion
+    {
+        major : string;
+        minor : string;
+        build : string;
+    }
+    class AmpPackage
+    {
+        name : string;
+        version : AmpVersion;
+        url : string;
+    }
+*/
     class AmpContext // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
     {
         code : object;
