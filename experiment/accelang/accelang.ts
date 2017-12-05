@@ -156,6 +156,11 @@ module accelang
             context.load(code);
             code = context.code;
         }
+        if (Array.isArray(code))
+        {
+            return code.map(i => evaluate(i, context));
+        }
+
         const type = code["&A"];
         if (undefined === type || null === type)
         {
