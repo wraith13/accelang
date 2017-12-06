@@ -63,11 +63,11 @@ module accelang
         {
             this.code.push(load(preprocess(preload(code), this)));
         }
-        execute() : any
+        execute() : object
         {
             return this.evaluate(this.code);
         }
-        evaluate(code : object) : any
+        evaluate(code : object) : object
         {
             if (Array.isArray(code))
             {
@@ -121,7 +121,7 @@ module accelang
         };
     }
     
-//    export function call(code : object, context : object) : any
+//    export function call(code : object, context : object) : object
 //    {
 //        const target = evaluate(code["target"], context);
 //        const argument = evaluate(code["argument"], context);
@@ -129,17 +129,17 @@ module accelang
 //        
 //    }
 
-    export function preload(code : object) : any
+    export function preload(code : object) : object
     {
         //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
         return load(code);
     }
-    export function preprocess(code : object, _context : AmpContext = null) : any
+    export function preprocess(code : object, _context : AmpContext = null) : object
     {
         return code;
     }
 
-    export function load(code : object) : any
+    export function load(code : object) : object
     {
         //  この関数の役割は全てのコードおよびデータをコードからアクセス可能な状態にすること。
         //  シンタックスエラーの類いの検出はこの関数内で行ってしまう。
@@ -184,7 +184,7 @@ module accelang
         return result;
     }
 
-    export function evaluate(code : object) : any
+    export function evaluate(code : object) : object
     {
         var context = new AmpContext();
         context.load(code);
