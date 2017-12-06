@@ -45,12 +45,12 @@ module accelang
 
     class AmpContext // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
     {
-        code : object[];
-        cache : object[];
-        statement : object[];
-        profiling : object[];
-        footstamp : object[];
-        coverage : object[];
+        code : object[] = [];
+        cache : object[] = [];
+        statement : object[] = [];
+        profiling : object[] = [];
+        footstamp : object[] = [];
+        coverage : object[] = [];
 
         get(pack : AmpPackage) : void
         {
@@ -63,10 +63,56 @@ module accelang
         {
             this.code.push(load(preprocess(preload(code), this)));
         }
+        execute() : any
+        {
+            return this.evaluate(this.code);
+        }
+        evaluate(code : object) : any
+        {
+            if (Array.isArray(code))
+            {
+                return code.map(i => this.evaluate(i));
+            }
+    
+            const type = code["&A"];
+            if (undefined === type || null === type)
+            {
+                return make_error("format error(missing type)", code);
+            }
+            else
+            {
+                switch(typeof(type))
+                {
+                case "string":
+                    switch(type)
+                    {
+    //                case "call":
+    //                    return call(code, context);
+    
+                    case "error":
+                        return code;
+    
+                    default:
+                        return make_error(`uknown type error: ${type}`, code);
+                    }
+                    
+                case "object":
+                    {
+                        //const complex_type = accelang.evaluate(type);
+                        break;
+                    }
+    
+                default:
+                    return make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
+                }
+            }
+            return make_error("intenal error", code);
+        }
     }
 
     function make_error(message : string, code : object = null) : object
     {
+        console.trace();
         accelang.error(message);
         return {
             "&A": "error",
@@ -138,61 +184,10 @@ module accelang
         return result;
     }
 
-    export function evaluate(code : object, context : AmpContext = null) : any
+    export function evaluate(code : object) : any
     {
-        if (null === code)
-        {
-            return null;
-        }
-        if (null === context)
-        {
-            context = new AmpContext();
-            context.code = [];
-            context.cache = [];
-            context.statement = [];
-            context.profiling = [];
-            context.footstamp = [];
-            context.coverage = [];
-            context.load(code);
-            code = context.code;
-        }
-        if (Array.isArray(code))
-        {
-            return code.map(i => evaluate(i, context));
-        }
-
-        const type = code["&A"];
-        if (undefined === type || null === type)
-        {
-            return make_error("format error(missing type)", code);
-        }
-        else
-        {
-            switch(typeof(type))
-            {
-            case "string":
-                switch(type)
-                {
-//                case "call":
-//                    return call(code, context);
-
-                case "error":
-                    return code;
-
-                default:
-                    return make_error(`uknown type error: ${type}`, code);
-                }
-                
-            case "object":
-                {
-                    //const complex_type = accelang.evaluate(type);
-                    break;
-                }
-
-            default:
-                return make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
-            }
-        }
-        return make_error("intenal error", code);
+        var context = new AmpContext();
+        context.load(code);
+        return context.execute();
     }
 }
