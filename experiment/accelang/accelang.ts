@@ -43,7 +43,7 @@ module accelang
         
     }
 
-    class AmpContext // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
+    export class AmpContext // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
     {
         code : object[] = [];
         cache : object[] = [];
@@ -184,10 +184,5 @@ module accelang
             "message":message,
             "code": code
         };
-    }
-    
-    export function evaluate(code : object) : object
-    {
-        return new AmpContext().load(code).execute();
     }
 }

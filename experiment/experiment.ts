@@ -121,10 +121,9 @@ function run() : void
         (
             JSON.stringify
             (
-                accelang.evaluate
-                (
-                    JSON.parse(getSourcodeElement().value)
-                ),
+                new accelang.AmpContext()
+                    .load(JSON.parse(getSourcodeElement().value))
+                    .execute(),
                 null,
                 4
             )
