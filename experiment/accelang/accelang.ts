@@ -22,10 +22,28 @@ module accelang
 
     class AmpVersion
     {
-        major : string;
-        minor : string;
-        build : string;
+        constructor
+        (
+            readonly major : string,
+            readonly minor : string,
+            readonly build : string
+        )
+        {
+        }
+
+        isCompatible(target : AmpVersion) : boolean
+        {
+            return this.major === target.major &&
+            (
+                parseInt(this.minor, 10) < parseInt(target.minor, 10) ||
+                (
+                    this.minor === target.minor &&
+                    parseInt(this.build, 10) <= parseInt(target.build, 10)
+                )
+            );
+        }
     }
+
     class AmpPackage
     {
         name : string;
@@ -45,12 +63,18 @@ module accelang
 
     export class AmpContext // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
     {
+        version : AmpVersion;
         code : object[] = [];
         cache : object[] = [];
         statement : object[] = [];
         profiling : object[] = [];
         footstamp : object[] = [];
         coverage : object[] = [];
+
+        constructor(version : AmpVersion | null = null)
+        {
+            this.version = version;
+        }
 
         get(pack : AmpPackage) : void
         {
