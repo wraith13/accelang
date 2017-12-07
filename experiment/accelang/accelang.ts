@@ -56,12 +56,77 @@ module accelang
         {
             pack.get
             (
-                code => load(code)
+                code => this.load(code)
             );
         }
-        load(code : object) : void
+
+//    call(code : object) : object
+//    {
+//        const target = this.evaluate(code["target"]);
+//        const argument = this.evaluate(code["argument"]);
+//
+//        
+//    }
+
+        load_core(code : object) : object
         {
-            this.code.push(load(preprocess(preload(code), this)));
+            //  この関数の役割は全てのコードおよびデータをコードからアクセス可能な状態にすること。
+            //  シンタックスエラーの類いの検出はこの関数内で行ってしまう。
+            //  エラーを検出しても可能な限り最後まで処理を行う。
+            //  この関数では例えそれが定数であっても評価は一切しない。(というかこの関数の処理が完了するまでは定数を評価する為に必要なコードやデータがアクセス可能な状態になっている保証がない。)
+    
+            var result = { };
+            const type = code["&A"];
+            if (undefined === type || null === type)
+            {
+                result = make_error("format error(missing type)", code);
+            }
+            else
+            {
+                switch(typeof(type))
+                {
+                case "string":
+                    switch(type)
+                    {
+    //                case "call":
+    //                    return call(code, context);
+    
+                    case "error":
+                        result = code;
+                        break;
+    
+                    default:
+                        result = make_error(`uknown type error: ${type}`, code);
+                    }
+                    break;
+                    
+                case "object":
+                    {
+                        //const complex_type = accelang.evaluate(type);
+                        break;
+                    }
+    
+                default:
+                    result = make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
+                }
+            }
+            return result;
+        }
+    
+        preload(code : object) : object
+        {
+            //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
+            return this.load_core(code);
+        }
+        preprocess(code : object, _context : AmpContext = null) : object
+        {
+            return code;
+        }
+    
+            load(code : object) : AmpContext
+        {
+            this.code.push(this.load_core(this.preprocess(this.preload(code), this)));
+            return this;
         }
         execute() : object
         {
@@ -121,73 +186,8 @@ module accelang
         };
     }
     
-//    export function call(code : object, context : object) : object
-//    {
-//        const target = evaluate(code["target"], context);
-//        const argument = evaluate(code["argument"], context);
-//
-//        
-//    }
-
-    export function preload(code : object) : object
-    {
-        //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
-        return load(code);
-    }
-    export function preprocess(code : object, _context : AmpContext = null) : object
-    {
-        return code;
-    }
-
-    export function load(code : object) : object
-    {
-        //  この関数の役割は全てのコードおよびデータをコードからアクセス可能な状態にすること。
-        //  シンタックスエラーの類いの検出はこの関数内で行ってしまう。
-        //  エラーを検出しても可能な限り最後まで処理を行う。
-        //  この関数では例えそれが定数であっても評価は一切しない。(というかこの関数の処理が完了するまでは定数を評価する為に必要なコードやデータがアクセス可能な状態になっている保証がない。)
-
-        var result = { };
-        const type = code["&A"];
-        if (undefined === type || null === type)
-        {
-            result = make_error("format error(missing type)", code);
-        }
-        else
-        {
-            switch(typeof(type))
-            {
-            case "string":
-                switch(type)
-                {
-//                case "call":
-//                    return call(code, context);
-
-                case "error":
-                    result = code;
-                    break;
-
-                default:
-                    result = make_error(`uknown type error: ${type}`, code);
-                }
-                break;
-                
-            case "object":
-                {
-                    //const complex_type = accelang.evaluate(type);
-                    break;
-                }
-
-            default:
-                result = make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
-            }
-        }
-        return result;
-    }
-
     export function evaluate(code : object) : object
     {
-        var context = new AmpContext();
-        context.load(code);
-        return context.execute();
+        return new AmpContext().load(code).execute();
     }
 }
