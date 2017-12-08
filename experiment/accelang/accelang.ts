@@ -153,12 +153,12 @@ module accelang
             //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
             return this.load_core(code);
         }
-        preprocess(code : object, _context : AmpContext = null) : object
+        preprocess(code : object, _context : AmpMachine = null) : object
         {
             return code;
         }
     
-            load(code : object) : AmpContext
+            load(code : object) : AmpMachine
         {
             this.code.push(this.load_core(this.preprocess(this.preload(code), this)));
             return this;
