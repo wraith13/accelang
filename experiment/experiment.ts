@@ -87,9 +87,9 @@ function select(url : string) : void
 function run() : void
 {
     getOutputElement().innerHTML = "";
-    const context = new accelang.AmpContext();
+    const machine = new accelang.AmpMachine();
     
-    context.log = (text : string) : void =>
+    machine.log = (text : string) : void =>
     {
         getOutputElement().appendChild
         (
@@ -103,7 +103,7 @@ function run() : void
             )
         );
     };
-    context.error = (text : string) : void =>
+    machine.error = (text : string) : void =>
     {
         getOutputElement().appendChild
         (
@@ -119,11 +119,11 @@ function run() : void
     };
     try
     {
-        context.log
+        machine.log
         (
             JSON.stringify
             (
-                context
+                machine
                     .load(JSON.parse(getSourcodeElement().value))
                     .execute(),
                 null,
@@ -133,6 +133,6 @@ function run() : void
     }
     catch(error)
     {
-        context.error(JSON.stringify(error));
+        machine.error(JSON.stringify(error));
     }
 }

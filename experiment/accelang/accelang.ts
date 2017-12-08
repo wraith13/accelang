@@ -58,7 +58,7 @@ module accelang
         
     }
 
-    export class AmpContext // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
+    export class AmpMachine // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
     {
         version : AmpVersion;
         code : object[] = [];
