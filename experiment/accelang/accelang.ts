@@ -4,7 +4,7 @@ module accelang
 {
     export function http_get(url : string, callback : (response_body : string)=>void) :void
     {
-        var request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
+        const request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
     
         request.open('GET', url, true);
         request.onreadystatechange = () =>
@@ -17,9 +17,6 @@ module accelang
         request.send(null);
     }
         
-    export var log : (text : string) => void = (text : string) => console.log(text);
-    export var error : (text : string) => void = (text : string) => console.error(text);
-
     class AmpVersion
     {
         constructor
@@ -71,10 +68,24 @@ module accelang
         footstamp : object[] = [];
         coverage : object[] = [];
 
+        log : (text : string) => void = (text : string) => console.log(text);
+        error : (text : string) => void = (text : string) => console.error(text);
+            
         constructor(version : AmpVersion | null = null)
         {
             this.version = version;
         }
+
+    make_error(message : string, code : object = null) : object
+    {
+        console.trace();
+        this.error(message);
+        return {
+            "&A": "error",
+            "message":message,
+            "code": code
+        };
+    }
 
         get(pack : AmpPackage) : void
         {
@@ -99,11 +110,11 @@ module accelang
             //  エラーを検出しても可能な限り最後まで処理を行う。
             //  この関数では例えそれが定数であっても評価は一切しない。(というかこの関数の処理が完了するまでは定数を評価する為に必要なコードやデータがアクセス可能な状態になっている保証がない。)
     
-            var result = { };
+            let result = { };
             const type = code["&A"];
             if (undefined === type || null === type)
             {
-                result = make_error("format error(missing type)", code);
+                result = this.make_error("format error(missing type)", code);
             }
             else
             {
@@ -120,7 +131,7 @@ module accelang
                         break;
     
                     default:
-                        result = make_error(`uknown type error: ${type}`, code);
+                        result = this.make_error(`uknown type error: ${type}`, code);
                     }
                     break;
                     
@@ -131,7 +142,7 @@ module accelang
                     }
     
                 default:
-                    result = make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
+                    result = this.make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
                 }
             }
             return result;
@@ -166,7 +177,7 @@ module accelang
             const type = code["&A"];
             if (undefined === type || null === type)
             {
-                return make_error("format error(missing type)", code);
+                return this.make_error("format error(missing type)", code);
             }
             else
             {
@@ -182,7 +193,7 @@ module accelang
                         return code;
     
                     default:
-                        return make_error(`uknown type error: ${type}`, code);
+                        return this.make_error(`uknown type error: ${type}`, code);
                     }
                     
                 case "object":
@@ -192,21 +203,10 @@ module accelang
                     }
     
                 default:
-                    return make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
+                    return this.make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
                 }
             }
-            return make_error("intenal error", code);
+            return this.make_error("intenal error", code);
         }
-    }
-
-    function make_error(message : string, code : object = null) : object
-    {
-        console.trace();
-        accelang.error(message);
-        return {
-            "&A": "error",
-            "message":message,
-            "code": code
-        };
     }
 }
