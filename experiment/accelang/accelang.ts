@@ -81,7 +81,7 @@ module accelang
 
     export class AmpCacheOption
     {
-
+        disabled : boolean = false;
     }
 
     export class AmpMachine // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
@@ -89,7 +89,7 @@ module accelang
         version : AmpVersion;
         code : object[] = [];
         cacheOption : AmpCacheOption = new AmpCacheOption();
-        cache : object[] = [];
+        cache : AmpCache[] = [];
         statement : object[] = [];
         profiling : object[] = [];
         footstamp : object[] = [];
@@ -175,19 +175,26 @@ module accelang
             return result;
         }
     
-        preload(code : object) : object
+        preload(filepath : string, code : object) : object
         {
             //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
-            return this.load_core(code);
+            return this.load_core
+            (
+                {
+                    "&A": "file",
+                    "filepath": filepath,
+                    "code": code
+                }
+            );
         }
         preprocess(code : object, _context : AmpMachine = null) : object
         {
             return code;
         }
     
-            load(code : object) : AmpMachine
+        load(filepath : string, code : object) : AmpMachine
         {
-            this.code.push(this.load_core(this.preprocess(this.preload(code), this)));
+            this.code.push(this.load_core(this.preprocess(this.preload(filepath, code), this)));
             return this;
         }
         execute() : object

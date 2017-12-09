@@ -124,7 +124,11 @@ function run() : void
             JSON.stringify
             (
                 machine
-                    .load(JSON.parse(getSourcodeElement().value))
+                    .load
+                    (
+                        "editor",
+                        JSON.parse(getSourcodeElement().value)
+                    )
                     .execute(),
                 null,
                 4
