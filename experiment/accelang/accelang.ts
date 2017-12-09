@@ -55,13 +55,40 @@ module accelang
                 (response_body) => callback(JSON.parse(response_body))
             );
         }
-        
+    }
+
+    class AmpCache
+    {
+        static make_function_key(function_signature : object) : string
+        {
+            return JSON.stringify(function_signature);
+        }
+        static make_argument_key(args : object) : string
+        {
+            return JSON.stringify(args);
+        }
+
+        readonly result : string;
+        readonly cost : number;
+        lastAccess : Date;
+        constructor(result : object, cost : number, now : Date)
+        {
+            this.result = JSON.stringify(result);
+            this.cost = cost;
+            this.lastAccess = now;
+        }
+    }
+
+    export class AmpCacheOption
+    {
+
     }
 
     export class AmpMachine // このクラスが抱えるデータはポータブルな状態にする方向で(環境ごとにビュアーを用意する羽目になるのも馬鹿馬鹿しいし)
     {
         version : AmpVersion;
         code : object[] = [];
+        cacheOption : AmpCacheOption = new AmpCacheOption();
         cache : object[] = [];
         statement : object[] = [];
         profiling : object[] = [];
@@ -76,16 +103,16 @@ module accelang
             this.version = version;
         }
 
-    make_error(message : string, code : object = null) : object
-    {
-        console.trace();
-        this.error(message);
-        return {
-            "&A": "error",
-            "message":message,
-            "code": code
-        };
-    }
+        make_error(message : string, code : object = null) : object
+        {
+            console.trace();
+            this.error(message);
+            return {
+                "&A": "error",
+                "message":message,
+                "code": code
+            };
+        }
 
         get(pack : AmpPackage) : void
         {
