@@ -127,7 +127,7 @@ function run() : void
                     .load
                     (
                         "editor",
-                        JSON.parse(getSourcodeElement().value)
+                        getSourcodeElement().value
                     )
                     .execute(),
                 null,

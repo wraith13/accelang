@@ -175,7 +175,7 @@ module accelang
             return result;
         }
     
-        preload(filepath : string, code : object) : object
+        preload(filepath : string, code : string) : object
         {
             //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
             return this.load_core
@@ -183,7 +183,7 @@ module accelang
                 {
                     "&A": "file",
                     "filepath": filepath,
-                    "code": code
+                    "code": JSON.parse(code)
                 }
             );
         }
@@ -192,7 +192,7 @@ module accelang
             return code;
         }
     
-        load(filepath : string, code : object) : AmpMachine
+        load(filepath : string, code : string) : AmpMachine
         {
             this.code.push(this.load_core(this.preprocess(this.preload(filepath, code), this)));
             return this;
