@@ -41,6 +41,13 @@ module accelang
         }
     }
 
+    class AmpCodeLocation
+    {
+        filepath : string;
+        line : number;
+        row : number;
+    }
+
     class AmpPackage
     {
         name : string;
@@ -194,7 +201,17 @@ module accelang
     
         load(filepath : string, code : string) : AmpMachine
         {
-            this.code.push(this.load_core(this.preprocess(this.preload(filepath, code), this)));
+            this.code.push
+            (
+                this.load_core
+                (
+                    this.preprocess
+                    (
+                        this.preload(filepath, code),
+                        this
+                    )
+                )
+            );
             return this;
         }
         execute() : object
