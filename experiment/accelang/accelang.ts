@@ -54,12 +54,12 @@ module accelang
         version : AmpVersion;
         url : string;
 
-        get(callback : (code : object)=>void) :void
+        get(callback : (code : string)=>void) :void
         {
             http_get
             (
                 this.url,
-                (response_body) => callback(JSON.parse(response_body))
+                (response_body) => callback(response_body)
             );
         }
     }
@@ -125,7 +125,11 @@ module accelang
         {
             pack.get
             (
-                code => this.load(code)
+                code => this.load
+                (
+                    pack.url,
+                    code
+                )
             );
         }
 
