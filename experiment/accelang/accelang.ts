@@ -41,6 +41,11 @@ module accelang
         }
     }
 
+    export function parseCode(_filepath : string, code : string) : object
+    {
+        return JSON.parse(code);
+    }
+
     class AmpCodeLocation
     {
         filepath : string;
@@ -191,11 +196,7 @@ module accelang
             //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
             return this.load_core
             (
-                {
-                    "&A": "file",
-                    "filepath": filepath,
-                    "code": JSON.parse(code)
-                }
+                parseCode(filepath, code)
             );
         }
         preprocess(code : object, _context : AmpMachine = null) : object
