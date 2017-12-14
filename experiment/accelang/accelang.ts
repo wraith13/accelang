@@ -41,11 +41,6 @@ module accelang
         }
     }
 
-    export function parseCode(_location : AmpCodeLocation, code : string) : object
-    {
-        return JSON.parse(code);
-    }
-
     class AmpCodeLocation
     {
         constructor
@@ -56,6 +51,14 @@ module accelang
         )
         {
         }
+    }
+
+    export function parseCode(location : AmpCodeLocation, code : string) : object
+    {
+        let line = location.line;
+        let row = location.row;
+
+        return JSON.parse(code);
     }
 
     class AmpPackage
