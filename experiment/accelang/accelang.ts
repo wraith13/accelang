@@ -16,6 +16,21 @@ module accelang
         };
         request.send(null);
     }
+
+    export function stacktrace() : string
+    {
+        //  copy from https://stackoverflow.com/questions/591857/how-can-i-get-a-javascript-stack-trace-when-i-throw-an-exception 
+        function st2(f)
+        {
+            return !f ? [] : st2(f.caller).concat([f.toString().split('(')[0].substring(9) + '(' + f.arguments.join(',') + ')']);
+        }
+        return st2(arguments.callee.caller);
+    }
+
+    export function deep_copy<T>(source : T) : T
+    {
+        return JSON.parse(JSON.stringify(source));
+    }
         
     class AmpVersion
     {
@@ -79,33 +94,71 @@ module accelang
         {
             return code.charAt(this.i);
         }
+
+        next(code : string)
+        {
+            const char = this.getChar(code);
+            if ("\r" === char || "\n" === char)
+            {
+                ++this.location.line;
+                this.location.row = 0;
+                ++this.i;
+                const trail_char = this.getChar(code);
+                if (("\r" === trail_char || "\n" === trail_char) && trail_char !== char) {
+                    ++this.i;
+                }
+            } else {
+                ++this.location.row;
+                ++this.i;
+            }
+        }
+
         skipWhiteSpace(code : string) : AmpParseCodeCursor
         {
             while(this.i < code.length)
             {
-                const char = this.getChar(code);
-                if (" " === char || "\t" === char)
-                {
-                    ++this.location.row;
-                    ++this.i;
-                }
-                else
-                if ("\r" === char || "\n" === char)
-                {
-                    ++this.location.line;
-                    this.location.row = 0;
-                    ++this.i;
-                    const trail_char = this.getChar(code);
-                    if (("\r" === trail_char || "\n" === trail_char) && trail_char !== char) {
-                        ++this.i;
-                    }
-                }
-                else
+                if (" \t\r\n".indexOf(this.getChar(code)) < 0)
                 {
                     break;
                 }
+                this.next(code);
             }
             return this;
+        }
+
+        getString(code : string) : string
+        {
+            const start_cursor = deep_copy(this);
+            const head_char = this.getChar(code);
+            if ("\"" !== head_char)
+            {
+                throw {
+                    "&A": "error",
+                    "message": "internal accelang error",
+                    "code": stacktrace()
+                };
+            }
+            this.next(code);
+            
+            while(this.i < code.length)
+            {
+                const char = this.getChar(code);
+                this.next(code);
+                if ("\"" === char)
+                {
+                    return JSON.parse(code.substr(start_cursor.i, this.i -start_cursor.i));
+                }
+                if ("\\" === char && this.i < code.length)
+                {
+                    this.next(code);
+                }
+            }
+
+            throw {
+                "&A": "error",
+                "message": "endless string",
+                "code": start_cursor
+            };
         }
     }
 
@@ -186,7 +239,7 @@ module accelang
             this.error(message);
             return {
                 "&A": "error",
-                "message":message,
+                "message": message,
                 "code": code
             };
         }
