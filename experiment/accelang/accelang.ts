@@ -74,6 +74,39 @@ module accelang
             this.location = location;
             this.i = i;
         }
+
+        getChar(code : string) : string
+        {
+            return code.charAt(this.i);
+        }
+        skipWhiteSpace(code : string) : AmpParseCodeCursor
+        {
+            while(this.i < code.length)
+            {
+                const char = this.getChar(code);
+                if (" " === char || "\t" === char)
+                {
+                    ++this.location.row;
+                    ++this.i;
+                }
+                else
+                if ("\r" === char || "\n" === char)
+                {
+                    ++this.location.line;
+                    this.location.row = 0;
+                    ++this.i;
+                    const trail_char = this.getChar(code);
+                    if (("\r" === trail_char || "\n" === trail_char) && trail_char !== char) {
+                        ++this.i;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return this;
+        }
     }
 
     export function parseCode(_cursor : AmpParseCodeCursor, code : string) : object
