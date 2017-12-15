@@ -43,22 +43,46 @@ module accelang
 
     class AmpCodeLocation
     {
+        filepath : string;
+        line : number;
+        row : number;
+
         constructor
         (
-            readonly filepath : string,
-            readonly line : number = 1,
-            readonly row : number = 1
+            filepath : string,
+            line : number = 1,
+            row : number = 1
         )
         {
+            this.filepath = filepath;
+            this.line = line;
+            this.row = row;
         }
     }
 
-    export function parseCode(location : AmpCodeLocation, code : string) : object
+    class AmpParseCodeCursor
     {
-        let line = location.line;
-        let row = location.row;
+        location : AmpCodeLocation;
+        i : number;
 
+        constructor
+        (
+            location : AmpCodeLocation,
+            i : number = 0
+        )
+        {
+            this.location = location;
+            this.i = i;
+        }
+    }
+
+    export function parseCode(_cursor : AmpParseCodeCursor, code : string) : object
+    {
         return JSON.parse(code);
+    }
+    export function parseFile(filepath : string, code : string) : object
+    {
+        return parseCode(new AmpParseCodeCursor(new AmpCodeLocation(filepath)), code);
     }
 
     class AmpPackage
@@ -204,7 +228,7 @@ module accelang
             //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
             return this.load_core
             (
-                parseCode(new AmpCodeLocation(filepath), code)
+                parseFile(filepath, code)
             );
         }
         preprocess(code : object, _context : AmpMachine = null) : object
