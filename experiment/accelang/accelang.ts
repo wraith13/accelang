@@ -2,6 +2,18 @@
 
 module accelang
 {
+    function assert(condition : boolean) : void
+    {
+        if (!condition)
+        {
+            throw {
+                "&A": "error",
+                "message": "internal accelang error",
+                "code": stacktrace()
+            };
+        }
+    }
+
     export function http_get(url : string, callback : (response_body : string)=>void) :void
     {
         const request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
@@ -97,6 +109,8 @@ module accelang
 
         next(code : string)
         {
+            assert(this.i < code.length);
+
             const char = this.getChar(code);
             if ("\r" === char || "\n" === char)
             {
@@ -112,6 +126,19 @@ module accelang
                 ++this.i;
             }
         }
+        seek(code : string, length : number) : AmpParseCodeCursor
+        {
+            assert(this.i +length <= code.length);
+            assert(code.substr(this.i, length).indexOf("\r") < 0);
+            assert(code.substr(this.i, length).indexOf("\n") < 0);
+            const aim = this.i +length;
+            while(this.i < aim)
+            {
+                this.next(code);
+            }
+            assert(this.i === aim);
+            return this;
+        }
 
         skipWhiteSpace(code : string) : AmpParseCodeCursor
         {
@@ -126,18 +153,14 @@ module accelang
             return this;
         }
 
-        getString(code : string) : string
+        getStringAndSeek(code : string) : string
         {
-            const start_cursor = deep_copy(this);
-            const head_char = this.getChar(code);
-            if ("\"" !== head_char)
+            if ("\"" !== this.getChar(code))
             {
-                throw {
-                    "&A": "error",
-                    "message": "internal accelang error",
-                    "code": stacktrace()
-                };
+                return null;
             }
+
+            const start_cursor = deep_copy(this);
             this.next(code);
             
             while(this.i < code.length)
@@ -159,6 +182,23 @@ module accelang
                 "message": "endless string",
                 "code": start_cursor
             };
+        }
+
+        isMatch(code : string, word : string) : boolean
+        {
+            assert(word.indexOf("\r") < 0);
+            assert(word.indexOf("\n") < 0);
+
+            return code.substr(this.i, word.length) === word;
+        }
+        isMatchAndSeek(code : string, word : string) : boolean
+        {
+            const result = this.isMatch(code, word);
+            if (result)
+            {
+                this.seek(code, word.length);
+            }
+            return result;
         }
     }
 
