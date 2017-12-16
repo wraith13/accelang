@@ -101,79 +101,104 @@ module accelang
             this.location = location;
             this.i = i;
         }
+    }
+    class AmpParseCode
+    {
+        cursor : AmpParseCodeCursor;
+        code : string;
 
-        getChar(code : string) : string
+        constructor
+        (
+            cursor : AmpParseCodeCursor,
+            code : string
+        )
         {
-            return code.charAt(this.i);
+            this.cursor = cursor;
+            this.code =code;
         }
 
-        next(code : string)
+        getChar() : string
         {
-            assert(this.i < code.length);
+            return this.code.charAt(this.cursor.i);
+        }
+        getSubStr(length : number) : string
+        {
+            return this.code.substr(this.cursor.i, length);
+        }
 
-            const char = this.getChar(code);
+        next()
+        {
+            assert(this.cursor.i < this.code.length);
+
+            const char = this.getChar();
             if ("\r" === char || "\n" === char)
             {
-                ++this.location.line;
-                this.location.row = 0;
-                ++this.i;
-                const trail_char = this.getChar(code);
+                ++this.cursor.location.line;
+                this.cursor.location.row = 0;
+                ++this.cursor.i;
+                const trail_char = this.getChar();
                 if (("\r" === trail_char || "\n" === trail_char) && trail_char !== char) {
-                    ++this.i;
+                    ++this.cursor.i;
                 }
             } else {
-                ++this.location.row;
-                ++this.i;
+                ++this.cursor.location.row;
+                ++this.cursor.i;
             }
         }
-        seek(code : string, length : number) : AmpParseCodeCursor
+        seek(length : number) : AmpParseCode
         {
-            assert(this.i +length <= code.length);
-            assert(code.substr(this.i, length).indexOf("\r") < 0);
-            assert(code.substr(this.i, length).indexOf("\n") < 0);
-            const aim = this.i +length;
-            while(this.i < aim)
+            assert(this.cursor.i +length <= this.code.length);
+            assert(this.getSubStr(length).indexOf("\r") < 0);
+            assert(this.getSubStr(length).indexOf("\n") < 0);
+            const aim = this.cursor.i +length;
+            while(this.cursor.i < aim)
             {
-                this.next(code);
+                this.next();
             }
-            assert(this.i === aim);
+            assert(this.cursor.i === aim);
             return this;
         }
 
-        skipWhiteSpace(code : string) : AmpParseCodeCursor
+        isWhiteSpace() : boolean
         {
-            while(this.i < code.length)
+            return 0 <= " \t\r\n".indexOf(this.getChar());
+        }
+
+        skipWhiteSpace() : AmpParseCode
+        {
+            while(!this.isEnd() && this.isWhiteSpace())
             {
-                if (" \t\r\n".indexOf(this.getChar(code)) < 0)
-                {
-                    break;
-                }
-                this.next(code);
+                this.next();
             }
             return this;
         }
 
-        getStringAndSeek(code : string) : string
+        isEnd() : boolean
         {
-            if ("\"" !== this.getChar(code))
+            return this.code.length <= this.cursor.i;
+        }
+
+        getStringAndSeek() : string
+        {
+            if ("\"" !== this.getChar())
             {
                 return null;
             }
 
-            const start_cursor = deep_copy(this);
-            this.next(code);
+            const start_cursor = deep_copy(this.cursor);
+            this.next();
             
-            while(this.i < code.length)
+            while(!this.isEnd())
             {
-                const char = this.getChar(code);
-                this.next(code);
+                const char = this.getChar();
+                this.next();
                 if ("\"" === char)
                 {
-                    return JSON.parse(code.substr(start_cursor.i, this.i -start_cursor.i));
+                    return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
                 }
-                if ("\\" === char && this.i < code.length)
+                if ("\\" === char && !this.isEnd())
                 {
-                    this.next(code);
+                    this.next();
                 }
             }
 
@@ -184,21 +209,70 @@ module accelang
             };
         }
 
-        isMatch(code : string, word : string) : boolean
+        getNumberAndSeek() : string
+        {
+            if ("-0123456789".indexOf(this.getChar()) < 0)
+            {
+                return null;
+            }
+
+            const start_cursor = deep_copy(this.cursor);
+
+            assert(false); // NYI
+            /*
+            this.next();
+            
+            while(!this.isEnd())
+            {
+                const char = this.getChar();
+                this.next();
+                if ("\"" === char)
+                {
+                }
+                if ("\\" === char && !this.isEnd())
+                {
+                    this.next();
+                }
+            }
+            */
+
+            return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
+        }
+
+        isMatch(word : string) : boolean
         {
             assert(word.indexOf("\r") < 0);
             assert(word.indexOf("\n") < 0);
 
-            return code.substr(this.i, word.length) === word;
+            return this.getSubStr(word.length) === word;
         }
-        isMatchAndSeek(code : string, word : string) : boolean
+        isMatchAndSeek(word : string) : boolean
         {
-            const result = this.isMatch(code, word);
+            const result = this.isMatch(word);
             if (result)
             {
-                this.seek(code, word.length);
+                this.seek(word.length);
             }
             return result;
+        }
+
+        getValueAndSeek() : any
+        {
+            const reserved_literals =
+            [
+                "null",
+                "false",
+                "true"
+            ];
+            for (let i = 0; i < reserved_literals.length; ++i) {
+                const reserved_literal = reserved_literals[i];
+                if (this.isMatchAndSeek(reserved_literal))
+                {
+                    return JSON.parse(reserved_literal);
+                }
+            }
+
+            assert(false); // NYI
         }
     }
 
