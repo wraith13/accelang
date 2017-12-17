@@ -39,7 +39,7 @@ setTimeout
 (
     () =>
     {
-        accelang.http_get
+        accelang.httpGet
         (
             "samples/index.json",
             samples => document
@@ -50,14 +50,14 @@ setTimeout
                     .map(i => `<li onclick=select('${i.url}')>${i.name}</li>`)
                     .join("")
         );
-        fill_height();
-        window.onresize = fill_height;
+        fillHeight();
+        window.onresize = fillHeight;
         (<HTMLElement>document.getElementsByClassName("run")[0]).onclick = run;
     },
     10
 );
 
-function fill_height() : void
+function fillHeight() : void
 {
     const list = [
         getSourcodeElement(),
@@ -77,7 +77,7 @@ function fill_height() : void
 
 function select(url : string) : void
 {
-    accelang.http_get
+    accelang.httpGet
     (
         url,
         sample => getSourcodeElement().value = sample

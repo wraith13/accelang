@@ -14,7 +14,7 @@ module accelang
         }
     }
 
-    export function http_get(url : string, callback : (response_body : string)=>void) :void
+    export function httpGet(url : string, callback : (response_body : string)=>void) :void
     {
         const request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
     
@@ -39,7 +39,7 @@ module accelang
         return st2(arguments.callee.caller);
     }
 
-    export function deep_copy<T>(source : T) : T
+    export function deepCopy<T>(source : T) : T
     {
         return JSON.parse(JSON.stringify(source));
     }
@@ -185,7 +185,7 @@ module accelang
                 return null;
             }
 
-            const start_cursor = deep_copy(this.cursor);
+            const start_cursor = deepCopy(this.cursor);
             this.next();
             
             while(!this.isEnd())
@@ -216,7 +216,7 @@ module accelang
                 return null;
             }
 
-            const start_cursor = deep_copy(this.cursor);
+            const start_cursor = deepCopy(this.cursor);
 
             assert(false); // NYI
             /*
@@ -293,7 +293,7 @@ module accelang
 
         get(callback : (code : string)=>void) :void
         {
-            http_get
+            httpGet
             (
                 this.url,
                 (response_body) => callback(response_body)
@@ -347,7 +347,7 @@ module accelang
             this.version = version;
         }
 
-        make_error(message : string, code : object = null) : object
+        makeError(message : string, code : object = null) : object
         {
             console.trace();
             this.error(message);
@@ -378,7 +378,7 @@ module accelang
 //        
 //    }
 
-        load_core(code : object) : object
+        loadCore(code : object) : object
         {
             //  この関数の役割は全てのコードおよびデータをコードからアクセス可能な状態にすること。
             //  シンタックスエラーの類いの検出はこの関数内で行ってしまう。
@@ -389,7 +389,7 @@ module accelang
             const type = code["&A"];
             if (undefined === type || null === type)
             {
-                result = this.make_error("format error(missing type)", code);
+                result = this.makeError("format error(missing type)", code);
             }
             else
             {
@@ -406,7 +406,7 @@ module accelang
                         break;
     
                     default:
-                        result = this.make_error(`uknown type error: ${type}`, code);
+                        result = this.makeError(`uknown type error: ${type}`, code);
                     }
                     break;
                     
@@ -417,7 +417,7 @@ module accelang
                     }
     
                 default:
-                    result = this.make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
+                    result = this.makeError(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
                 }
             }
             return result;
@@ -426,7 +426,7 @@ module accelang
         preload(filepath : string, code : string) : object
         {
             //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
-            return this.load_core
+            return this.loadCore
             (
                 parseFile(filepath, code)
             );
@@ -440,7 +440,7 @@ module accelang
         {
             this.code.push
             (
-                this.load_core
+                this.loadCore
                 (
                     this.preprocess
                     (
@@ -465,7 +465,7 @@ module accelang
             const type = code["&A"];
             if (undefined === type || null === type)
             {
-                return this.make_error("format error(missing type)", code);
+                return this.makeError("format error(missing type)", code);
             }
             else
             {
@@ -481,7 +481,7 @@ module accelang
                         return code;
     
                     default:
-                        return this.make_error(`uknown type error: ${type}`, code);
+                        return this.makeError(`uknown type error: ${type}`, code);
                     }
                     
                 case "object":
@@ -491,10 +491,10 @@ module accelang
                     }
     
                 default:
-                    return this.make_error(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
+                    return this.makeError(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
                 }
             }
-            return this.make_error("intenal error", code);
+            return this.makeError("intenal error", code);
         }
     }
 }
