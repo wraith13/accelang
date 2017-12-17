@@ -211,30 +211,74 @@ module accelang
 
         getNumberAndSeek() : string
         {
-            if ("-0123456789".indexOf(this.getChar()) < 0)
+            let char = this.getChar();
+            if ("-0123456789".indexOf(char) < 0)
             {
                 return null;
             }
 
             const start_cursor = deepCopy(this.cursor);
 
-            assert(false); // NYI
-            /*
-            this.next();
-            
-            while(!this.isEnd())
+            if ("-" === char) // マイナスを受け付けるの最初のひと文字目だけ
             {
-                const char = this.getChar();
                 this.next();
-                if ("\"" === char)
-                {
-                }
-                if ("\\" === char && !this.isEnd())
+                char = this.getChar();
+            }
+
+            if ("0" === char)
+            {
+                //  0 始まりの場合は小数点以上の数値はもうそれ以上受け付けない
+                this.next();
+                char = this.getChar();
+            }
+            else
+            if (0 <= "123456789".indexOf(char))
+            {
+                do
                 {
                     this.next();
+                    char = this.getChar();
                 }
+                while(0 <= "0123456789".indexOf(char));
             }
-            */
+            else
+            {
+                return null; // 数値ではないなにか
+            }
+            //  小数点以上の数値ここまで
+
+            if ("." === char) // この位置でのみ小数点を受け付ける
+            {
+                do
+                {
+                    this.next();
+                    char = this.getChar();
+                }
+                while(0 <= "0123456789".indexOf(char));
+            }
+
+            if ("e" === char || "E" === char)
+            {
+                this.next();
+                char = this.getChar();
+                if ("+" === char || "-" === char)
+                {
+                    this.next();
+                    char = this.getChar();
+                }
+                
+                if ("0123456789".indexOf(char) < 0)
+                {
+                    return null;
+                }
+
+                do
+                {
+                    this.next();
+                    char = this.getChar();
+                }
+                while(0 <= "0123456789".indexOf(char));
+            }
 
             return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
         }
