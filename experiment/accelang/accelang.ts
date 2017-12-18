@@ -302,20 +302,32 @@ module accelang
 
         getValueAndSeek() : any
         {
-            const reserved_literals =
+            const reservedLiterals =
             [
                 "null",
                 "false",
                 "true"
             ];
-            for (let i = 0; i < reserved_literals.length; ++i) {
-                const reserved_literal = reserved_literals[i];
+            for (let i = 0; i < reservedLiterals.length; ++i) {
+                const reserved_literal = reservedLiterals[i];
                 if (this.isMatchAndSeek(reserved_literal))
                 {
                     return JSON.parse(reserved_literal);
                 }
             }
 
+            const stringValue = this.getStringAndSeek();
+            if (null !== stringValue)
+            {
+                return stringValue;
+            }
+
+            const numberValue = this.getNumberAndSeek();
+            if (null !== numberValue)
+            {
+                return numberValue;
+            }
+            
             assert(false); // NYI
         }
     }
