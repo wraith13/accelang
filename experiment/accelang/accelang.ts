@@ -330,6 +330,69 @@ module accelang
             
             assert(false); // NYI
         }
+
+        getArayAndSeek() : any
+        {
+            if ("[" !== this.getChar())
+            {
+                return null;
+            }
+
+            let result = [];
+            const start_cursor = deepCopy(this.cursor);
+            this.next();
+            
+            while(!this.isEnd())
+            {
+                assert(false); // NYI
+
+                this.skipWhiteSpace();
+                let i = this.getValueAndSeek();
+
+                const char = this.getChar();
+                this.next();
+                if ("]" === char)
+                {
+                    return result;
+                }
+            }
+
+            throw {
+                "&A": "error",
+                "message": "endless array",
+                "code": start_cursor
+            };
+        }
+
+        getObjectAndSeek() : any
+        {
+            if ("{" !== this.getChar())
+            {
+                return null;
+            }
+
+            const start_cursor = deepCopy(this.cursor);
+            this.next();
+            
+            while(!this.isEnd())
+            {
+                assert(false); // NYI
+
+                const char = this.getChar();
+                this.next();
+                if ("}" === char)
+                {
+                    return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
+                }
+            }
+
+            throw {
+                "&A": "error",
+                "message": "endless object",
+                "code": start_cursor
+            };
+        }
+
     }
 
     export function parseCode(_cursor : AmpParseCodeCursor, code : string) : object
