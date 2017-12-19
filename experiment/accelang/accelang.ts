@@ -182,7 +182,7 @@ module accelang
         {
             if ("\"" !== this.getChar())
             {
-                return null;
+                return undefined;
             }
 
             const start_cursor = deepCopy(this.cursor);
@@ -214,7 +214,7 @@ module accelang
             let char = this.getChar();
             if ("-0123456789".indexOf(char) < 0)
             {
-                return null;
+                return undefined;
             }
 
             const start_cursor = deepCopy(this.cursor);
@@ -243,7 +243,7 @@ module accelang
             }
             else
             {
-                return null; // 数値ではないなにか
+                return undefined; // 数値ではないなにか
             }
             //  小数点以上の数値ここまで
 
@@ -269,7 +269,7 @@ module accelang
                 
                 if ("0123456789".indexOf(char) < 0)
                 {
-                    return null;
+                    return undefined;
                 }
 
                 do
@@ -317,13 +317,13 @@ module accelang
             }
 
             const stringValue = this.getStringAndSeek();
-            if (null !== stringValue)
+            if (undefined !== stringValue)
             {
                 return stringValue;
             }
 
             const numberValue = this.getNumberAndSeek();
-            if (null !== numberValue)
+            if (undefined !== numberValue)
             {
                 return numberValue;
             }
@@ -335,40 +335,97 @@ module accelang
         {
             if ("[" !== this.getChar())
             {
-                return null;
+                return undefined;
             }
 
             let result = [];
             const start_cursor = deepCopy(this.cursor);
             this.next();
-            
-            while(!this.isEnd())
+
+            this.skipWhiteSpace();
+            if(this.isEnd())
             {
-                assert(false); // NYI
-
-                this.skipWhiteSpace();
-                let i = this.getValueAndSeek();
-
-                const char = this.getChar();
-                this.next();
-                if ("]" === char)
+                throw {
+                    "&A": "error",
+                    "message": "endless array",
+                    "code": start_cursor
+                };
+            }
+            let char = this.getChar();
+            if ("]" !== char)
+            {
+                while(true)
                 {
-                    return result;
+                    assert(false); // NYI
+    
+                    let i = this.getValueAndSeek();
+                    if (undefined !== i)
+                    {
+                        result.push(i);
+                        this.skipWhiteSpace();
+                    }
+                    else
+                    {
+                        throw {
+                            "&A": "error",
+                            "message": "unexpected array element",
+                            "code": {
+                                "element": this.getSubStr(32),
+                                "cursor": this.cursor
+                            }
+                        };
+                    }
+                    if(this.isEnd())
+                    {
+                        throw {
+                            "&A": "error",
+                            "message": "endless array",
+                            "code": start_cursor
+                        };
+                    }
+            
+                    const char = this.getChar();
+                    if ("]" === char)
+                    {
+                        break;
+                    }
+                    else
+                    if ("," === char)
+                    {
+                        this.next();
+                        this.skipWhiteSpace();
+                        if(this.isEnd())
+                        {
+                            throw {
+                                "&A": "error",
+                                "message": "endless array",
+                                "code": start_cursor
+                            };
+                        }
+                    }
+                    else
+                    {
+                        throw {
+                            "&A": "error",
+                            "message": "unexpected charactor ( expected: ']' or ',' )",
+                            "code": {
+                                "char": char,
+                                "cursor": this.cursor
+                            }
+                        };
+                    }
                 }
             }
+            this.next();
 
-            throw {
-                "&A": "error",
-                "message": "endless array",
-                "code": start_cursor
-            };
+            return result;
         }
 
         getObjectAndSeek() : any
         {
             if ("{" !== this.getChar())
             {
-                return null;
+                return undefined;
             }
 
             const start_cursor = deepCopy(this.cursor);
