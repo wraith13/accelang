@@ -126,7 +126,7 @@ module accelang
             return this.code.substr(this.cursor.i, length);
         }
 
-        next()
+        next() : AmpParseCode
         {
             assert(this.cursor.i < this.code.length);
 
@@ -144,6 +144,7 @@ module accelang
                 ++this.cursor.location.row;
                 ++this.cursor.i;
             }
+            return this;
         }
         seek(length : number) : AmpParseCode
         {
@@ -186,12 +187,10 @@ module accelang
             }
 
             const start_cursor = deepCopy(this.cursor);
-            this.next();
             
-            while(!this.isEnd())
+            while(!this.next().isEnd())
             {
                 const char = this.getChar();
-                this.next();
                 if ("\"" === char)
                 {
                     return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
@@ -211,33 +210,23 @@ module accelang
 
         getNumberAndSeek() : string
         {
-            let char = this.getChar();
-            if ("-0123456789".indexOf(char) < 0)
-            {
-                return undefined;
-            }
-
             const start_cursor = deepCopy(this.cursor);
-
+            let char = this.getChar();
             if ("-" === char) // マイナスを受け付けるの最初のひと文字目だけ
             {
-                this.next();
-                char = this.getChar();
+                char = this.next().getChar();
             }
-
             if ("0" === char)
             {
                 //  0 始まりの場合は小数点以上の数値はもうそれ以上受け付けない
-                this.next();
-                char = this.getChar();
+                char = this.next().getChar();
             }
             else
             if (0 <= "123456789".indexOf(char))
             {
                 do
                 {
-                    this.next();
-                    char = this.getChar();
+                    char = this.next().getChar();
                 }
                 while(0 <= "0123456789".indexOf(char));
             }
@@ -251,20 +240,17 @@ module accelang
             {
                 do
                 {
-                    this.next();
-                    char = this.getChar();
+                    char = this.next().getChar();
                 }
                 while(0 <= "0123456789".indexOf(char));
             }
 
             if ("e" === char || "E" === char)
             {
-                this.next();
-                char = this.getChar();
+                char = this.next().getChar();
                 if ("+" === char || "-" === char)
                 {
-                    this.next();
-                    char = this.getChar();
+                    char = this.next().getChar();
                 }
                 
                 if ("0123456789".indexOf(char) < 0)
@@ -274,8 +260,7 @@ module accelang
 
                 do
                 {
-                    this.next();
-                    char = this.getChar();
+                    char = this.next().getChar();
                 }
                 while(0 <= "0123456789".indexOf(char));
             }
@@ -340,10 +325,7 @@ module accelang
 
             let result = [];
             const start_cursor = deepCopy(this.cursor);
-            this.next();
-
-            this.skipWhiteSpace();
-            if(this.isEnd())
+            if (this.next().skipWhiteSpace().isEnd())
             {
                 throw {
                     "&A": "error",
@@ -359,12 +341,7 @@ module accelang
                     assert(false); // NYI
     
                     let i = this.getValueAndSeek();
-                    if (undefined !== i)
-                    {
-                        result.push(i);
-                        this.skipWhiteSpace();
-                    }
-                    else
+                    if (undefined === i)
                     {
                         throw {
                             "&A": "error",
@@ -375,7 +352,8 @@ module accelang
                             }
                         };
                     }
-                    if(this.isEnd())
+                    result.push(i);
+                    if(this.skipWhiteSpace().isEnd())
                     {
                         throw {
                             "&A": "error",
@@ -392,9 +370,7 @@ module accelang
                     else
                     if ("," === char)
                     {
-                        this.next();
-                        this.skipWhiteSpace();
-                        if(this.isEnd())
+                        if (this.next().skipWhiteSpace().isEnd())
                         {
                             throw {
                                 "&A": "error",
