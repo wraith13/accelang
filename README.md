@@ -279,13 +279,12 @@ x = add(a, b); と言った感じの加算する関数を add(a=, b) = x; ある
 
 かなり野心的な機能なので、頓挫する可能性大。
 
-
 ## ライセンス
 
 Boost Software License - Version 1.0 を採用しています。
 詳細は [.\LICENSE_1_0.txt](./LICENSE_1_0.txt) を参照してください。
 
-日本語参考訳: http://hamigaki.sourceforge.jp/doc/html/license.html
+日本語参考訳: <http://hamigaki.sourceforge.jp/doc/html/license.html>
 
 ## バージョン採番ルール
 
