@@ -39,6 +39,11 @@ module accelang
         return st2(arguments.callee.caller);
     }
 
+    export function debug_out_json(data : object) : void
+    {
+        console.log(JSON.stringify(data));
+    }
+
     export function deepCopy<T>(source : T) : T
     {
         return JSON.parse(JSON.stringify(source));
@@ -121,6 +126,12 @@ module accelang
         {
             return this.code.charAt(this.cursor.i);
         }
+        getCharAndSeek() : string
+        {
+            const char = this.getChar();
+            this.next();
+            return char;
+        }
         getSubStr(length : number) : string
         {
             return this.code.substr(this.cursor.i, length);
@@ -179,6 +190,15 @@ module accelang
             return this.code.length <= this.cursor.i;
         }
 
+        ifEndThenThrow(exception : object) : AmpParseCode
+        {
+            if (this.isEnd())
+            {
+                throw exception;
+            }
+            return this;
+        }
+
         getStringAndSeek() : string
         {
             if ("\"" !== this.getChar())
@@ -187,10 +207,11 @@ module accelang
             }
 
             const start_cursor = deepCopy(this.cursor);
+            this.next();
             
-            while(!this.next().isEnd())
+            while(!this.isEnd())
             {
-                const char = this.getChar();
+                const char = this.getCharAndSeek();
                 if ("\"" === char)
                 {
                     return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
@@ -293,7 +314,8 @@ module accelang
                 "false",
                 "true"
             ];
-            for (let i = 0; i < reservedLiterals.length; ++i) {
+            for (let i = 0; i < reservedLiterals.length; ++i)
+            {
                 const reserved_literal = reservedLiterals[i];
                 if (this.isMatchAndSeek(reserved_literal))
                 {
@@ -301,16 +323,20 @@ module accelang
                 }
             }
 
-            const stringValue = this.getStringAndSeek();
-            if (undefined !== stringValue)
+            const getValueMethods =
+            [
+                () => this.getStringAndSeek(),
+                () => this.getNumberAndSeek(),
+                () => this.getArayAndSeek(),
+                () => this.getObjectAndSeek()
+            ];
+            for (let i = 0; i < getValueMethods.length; ++i)
             {
-                return stringValue;
-            }
-
-            const numberValue = this.getNumberAndSeek();
-            if (undefined !== numberValue)
-            {
-                return numberValue;
+                const value = getValueMethods[i]();
+                if (undefined !== value)
+                {
+                    return value;
+                }
             }
             
             assert(false); // NYI
@@ -325,21 +351,16 @@ module accelang
 
             let result = [];
             const start_cursor = deepCopy(this.cursor);
-            if (this.next().skipWhiteSpace().isEnd())
-            {
-                throw {
-                    "&A": "error",
-                    "message": "endless array",
-                    "code": start_cursor
-                };
-            }
-            let char = this.getChar();
-            if ("]" !== char)
+            const endless_array_exception = {
+                "&A": "error",
+                "message": "endless array",
+                "code": start_cursor
+            };
+            
+            if ("]" !== this.next().skipWhiteSpace().ifEndThenThrow(endless_array_exception).getChar())
             {
                 while(true)
                 {
-                    assert(false); // NYI
-    
                     let i = this.getValueAndSeek();
                     if (undefined === i)
                     {
@@ -353,33 +374,13 @@ module accelang
                         };
                     }
                     result.push(i);
-                    if(this.skipWhiteSpace().isEnd())
-                    {
-                        throw {
-                            "&A": "error",
-                            "message": "endless array",
-                            "code": start_cursor
-                        };
-                    }
             
-                    const char = this.getChar();
+                    const char = this.skipWhiteSpace().ifEndThenThrow(endless_array_exception).getChar();
                     if ("]" === char)
                     {
                         break;
                     }
-                    else
-                    if ("," === char)
-                    {
-                        if (this.next().skipWhiteSpace().isEnd())
-                        {
-                            throw {
-                                "&A": "error",
-                                "message": "endless array",
-                                "code": start_cursor
-                            };
-                        }
-                    }
-                    else
+                    if ("," !== char)
                     {
                         throw {
                             "&A": "error",
@@ -390,6 +391,7 @@ module accelang
                             }
                         };
                     }
+                    this.next().skipWhiteSpace().ifEndThenThrow(endless_array_exception);
                 }
             }
             this.next();
@@ -404,33 +406,92 @@ module accelang
                 return undefined;
             }
 
+            let result = {};
             const start_cursor = deepCopy(this.cursor);
-            this.next();
-            
-            while(!this.isEnd())
-            {
-                assert(false); // NYI
-
-                const char = this.getChar();
-                this.next();
-                if ("}" === char)
-                {
-                    return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
-                }
-            }
-
-            throw {
+            const endless_object_exception = {
                 "&A": "error",
                 "message": "endless object",
                 "code": start_cursor
             };
+            
+            if ("}" !== this.next().skipWhiteSpace().ifEndThenThrow(endless_object_exception).getChar())
+            {
+                while(true)
+                {
+                    let key = this.getStringAndSeek();
+                    if (undefined === key)
+                    {
+                        throw {
+                            "&A": "error",
+                            "message": "unexpected object name",
+                            "code": {
+                                "element": this.getSubStr(32),
+                                "cursor": this.cursor
+                            }
+                        };
+                    }
+                    const separator = this.skipWhiteSpace().ifEndThenThrow(endless_object_exception).getChar();
+                    if (":" !== separator)
+                    {
+                        throw {
+                            "&A": "error",
+                            "message": "unexpected charactor ( expected: ':' )",
+                            "code": {
+                                "char": separator,
+                                "cursor": this.cursor
+                            }
+                        };
+                    }
+
+                    let value = this.next().skipWhiteSpace().ifEndThenThrow(endless_object_exception).getValueAndSeek();
+                    if (undefined === value)
+                    {
+                        throw {
+                            "&A": "error",
+                            "message": "unexpected object value",
+                            "code": {
+                                "element": this.getSubStr(32),
+                                "cursor": this.cursor
+                            }
+                        };
+                    }
+                    result[key] = value;
+                    
+                    const char = this.skipWhiteSpace().ifEndThenThrow(endless_object_exception).getChar();
+                    if ("}" === char)
+                    {
+                        break;
+                    }
+                    if ("," !== char)
+                    {
+                        throw {
+                            "&A": "error",
+                            "message": "unexpected charactor ( expected: ']' or ',' )",
+                            "code": {
+                                "char": char,
+                                "cursor": this.cursor
+                            }
+                        };
+                    }
+                    this.next().skipWhiteSpace().ifEndThenThrow(endless_object_exception);
+                }
+            }
+            this.next();
+
+            return result;
         }
 
     }
 
-    export function parseCode(_cursor : AmpParseCodeCursor, code : string) : object
+    export function parseCode(cursor : AmpParseCodeCursor, code : string) : object
     {
-        return JSON.parse(code);
+        //return JSON.parse(code);
+        const empty_json_exception = {
+            "&A": "error",
+            "message": "empty json",
+            "code": cursor.location.filepath
+        };
+        return new AmpParseCode(cursor, code).skipWhiteSpace().ifEndThenThrow(empty_json_exception).getValueAndSeek();
     }
     export function parseFile(filepath : string, code : string) : object
     {
