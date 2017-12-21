@@ -145,7 +145,7 @@ module accelang
             if ("\r" === char || "\n" === char)
             {
                 ++this.cursor.location.line;
-                this.cursor.location.row = 0;
+                this.cursor.location.row = 1;
                 ++this.cursor.i;
                 const trail_char = this.getChar();
                 if (("\r" === trail_char || "\n" === trail_char) && trail_char !== char) {
@@ -491,7 +491,21 @@ module accelang
             "message": "empty json",
             "code": cursor.location.filepath
         };
-        return new AmpParseCode(cursor, code).skipWhiteSpace().ifEndThenThrow(empty_json_exception).getValueAndSeek();
+        const parser = new AmpParseCode(cursor, code);
+        const result = parser.skipWhiteSpace().ifEndThenThrow(empty_json_exception).getValueAndSeek();
+        parser.skipWhiteSpace();
+        if (!parser.isEnd())
+        {
+            throw {
+                "&A": "error",
+                "message": "unexpected charactor ( expected: End of File )",
+                "code": {
+                    "char": parser.getChar(),
+                    "cursor": parser.cursor
+                }
+            };
+}
+        return result;
     }
     export function parseFile(filepath : string, code : string) : object
     {
