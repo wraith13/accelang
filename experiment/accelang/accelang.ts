@@ -90,6 +90,13 @@ module accelang
             this.line = line;
             this.row = row;
         }
+
+        nextLine() : AmpCodeLocation
+        {
+            this.line++;
+            this.row = 1;
+            return this;
+        }
     }
 
     class AmpParseCodeCursor
@@ -142,18 +149,16 @@ module accelang
             assert(this.cursor.i < this.code.length);
 
             const char = this.getChar();
+            ++this.cursor.i;
             if ("\r" === char || "\n" === char)
             {
-                ++this.cursor.location.line;
-                this.cursor.location.row = 1;
-                ++this.cursor.i;
+                this.cursor.location.nextLine();
                 const trail_char = this.getChar();
                 if (("\r" === trail_char || "\n" === trail_char) && trail_char !== char) {
                     ++this.cursor.i;
                 }
             } else {
                 ++this.cursor.location.row;
-                ++this.cursor.i;
             }
             return this;
         }
@@ -339,7 +344,7 @@ module accelang
                 }
             }
             
-            assert(false); // NYI
+            return undefined;
         }
 
         getArayAndSeek() : any
