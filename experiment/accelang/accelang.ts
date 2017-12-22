@@ -31,12 +31,7 @@ module accelang
 
     export function stacktrace() : string
     {
-        //  copy from https://stackoverflow.com/questions/591857/how-can-i-get-a-javascript-stack-trace-when-i-throw-an-exception 
-        function st2(f)
-        {
-            return !f ? [] : st2(f.caller).concat([f.toString().split('(')[0].substring(9) + '(' + f.arguments.join(',') + ')']);
-        }
-        return st2(arguments.callee.caller);
+        return new Error().stack;
     }
 
     export function debug_out_json(data : object) : void
@@ -221,9 +216,18 @@ module accelang
                 {
                     return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
                 }
+                if ("\r" === char || "\n" === char)
+                {
+                    throw {
+                        "&A": "error",
+                        "message": "missing string end  ( expected: '\"' before new line )",
+                        "code": start_cursor
+                    };
+                }
                 if ("\\" === char && !this.isEnd())
                 {
-                    this.next();
+                    const trail_char = this.getCharAndSeek();
+                    //  ここで trail_char の内容を検査
                 }
             }
 
