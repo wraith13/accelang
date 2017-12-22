@@ -226,8 +226,23 @@ module accelang
                 }
                 if ("\\" === char && !this.isEnd())
                 {
-                    const trail_char = this.getCharAndSeek();
-                    //  ここで trail_char の内容を検査
+                    const trail_char = this.getChar();
+                    if ("\"\\/bfnft".indexOf(trail_char) < 0)
+                    {
+                        if ("u" === trail_char)
+                        {
+                            //  4桁の16進コードのチェック
+                        }
+                        else
+                        {
+                            throw {
+                                "&A": "error",
+                                "message": "illegal escape ( expected '\"', '\\', '/', 'b', 'f', 'n', 'f', 't', 'u' )",
+                                "code": this.cursor
+                            };
+                        }
+                    }
+                    this.next();
                 }
             }
 
