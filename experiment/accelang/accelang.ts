@@ -199,6 +199,43 @@ module accelang
             return this;
         }
 
+        isMatch(word : string) : boolean
+        {
+            assert(word.indexOf("\r") < 0);
+            assert(word.indexOf("\n") < 0);
+
+            return this.getSubStr(word.length) === word;
+        }
+        isMatchAndSeek(word : string) : boolean
+        {
+            const result = this.isMatch(word);
+            if (result)
+            {
+                this.seek(word.length);
+            }
+            return result;
+        }
+
+        getReservedLiteralAndSeek() : any
+        {
+            const reservedLiterals =
+            [
+                "null",
+                "false",
+                "true"
+            ];
+            for (let i = 0; i < reservedLiterals.length; ++i)
+            {
+                const reserved_literal = reservedLiterals[i];
+                if (this.isMatchAndSeek(reserved_literal))
+                {
+                    return JSON.parse(reserved_literal);
+                }
+            }
+           
+            return undefined;
+        }
+
         getStringAndSeek() : string
         {
             if ("\"" !== this.getChar())
@@ -227,7 +264,7 @@ module accelang
                 if ("\\" === char && !this.isEnd())
                 {
                     const trail_char = this.getChar();
-                    if ("\"\\/bfnft".indexOf(trail_char) < 0)
+                    if ("\"\\/bfnrft".indexOf(trail_char) < 0)
                     {
                         if ("u" === trail_char)
                         {
@@ -237,7 +274,7 @@ module accelang
                         {
                             throw {
                                 "&A": "error",
-                                "message": "illegal escape ( expected '\"', '\\', '/', 'b', 'f', 'n', 'f', 't', 'u' )",
+                                "message": "illegal escape ( expected '\"', '\\', '/', 'b', 'f', 'n', 'f', 'r', 't', 'u' )",
                                 "code": this.cursor
                             };
                         }
@@ -313,57 +350,22 @@ module accelang
             return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
         }
 
-        isMatch(word : string) : boolean
-        {
-            assert(word.indexOf("\r") < 0);
-            assert(word.indexOf("\n") < 0);
-
-            return this.getSubStr(word.length) === word;
-        }
-        isMatchAndSeek(word : string) : boolean
-        {
-            const result = this.isMatch(word);
-            if (result)
-            {
-                this.seek(word.length);
-            }
-            return result;
-        }
-
         getValueAndSeek() : any
         {
-            const reservedLiterals =
-            [
-                "null",
-                "false",
-                "true"
-            ];
-            for (let i = 0; i < reservedLiterals.length; ++i)
-            {
-                const reserved_literal = reservedLiterals[i];
-                if (this.isMatchAndSeek(reserved_literal))
-                {
-                    return JSON.parse(reserved_literal);
-                }
-            }
-
+            let result = undefined;
             const getValueMethods =
             [
+                () => this.getReservedLiteralAndSeek(),
                 () => this.getStringAndSeek(),
                 () => this.getNumberAndSeek(),
                 () => this.getArayAndSeek(),
                 () => this.getObjectAndSeek()
             ];
-            for (let i = 0; i < getValueMethods.length; ++i)
+            for (let i = 0; i < getValueMethods.length && undefined === result; ++i)
             {
-                const value = getValueMethods[i]();
-                if (undefined !== value)
-                {
-                    return value;
-                }
+                result = getValueMethods[i]();
             }
-            
-            return undefined;
+            return result;
         }
 
         getArayAndSeek() : any
