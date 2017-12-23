@@ -137,6 +137,22 @@ function run() : void
     }
     catch(error)
     {
-        machine.error(JSON.stringify(error));
+        machine.error
+        (
+            JSON.stringify
+            (
+                error["&A"] ?
+                    error:
+                    {
+                        "JavaScript.Error": {
+                            "name": error.name,
+                            "message": error.message,
+                            "stack": error.stack.split("\n")
+                        }
+                    },
+                null,
+                4
+            )
+        );
     }
 }
