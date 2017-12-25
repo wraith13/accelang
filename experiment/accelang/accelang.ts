@@ -244,14 +244,19 @@ module accelang
             }
 
             const start_cursor = deepCopy(this.cursor);
-            this.next();
-            
-            while(!this.isEnd())
+            const endless_string_exception =
             {
-                const char = this.getCharAndSeek();
+                "&A": "error",
+                "message": "endless string",
+                "code": start_cursor
+            };
+            this.next();
+            while(true)
+            {
+                let char = this.ifEndThenThrow(endless_string_exception).getCharAndSeek();
                 if ("\"" === char)
                 {
-                    return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
+                    break;
                 }
                 if ("\r" === char || "\n" === char)
                 {
@@ -261,9 +266,9 @@ module accelang
                         "code": start_cursor
                     };
                 }
-                if ("\\" === char && !this.isEnd())
+                if ("\\" === char)
                 {
-                    const trail_char = this.getChar();
+                    const trail_char = this.ifEndThenThrow(endless_string_exception).getCharAndSeek();
                     if ("\"\\/bfnrft".indexOf(trail_char) < 0)
                     {
                         if ("u" === trail_char)
@@ -279,15 +284,9 @@ module accelang
                             };
                         }
                     }
-                    this.next();
                 }
             }
-
-            throw {
-                "&A": "error",
-                "message": "endless string",
-                "code": start_cursor
-            };
+            return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
         }
 
         getNumberAndSeek() : string
@@ -377,7 +376,8 @@ module accelang
 
             let result = [];
             const start_cursor = deepCopy(this.cursor);
-            const endless_array_exception = {
+            const endless_array_exception =
+            {
                 "&A": "error",
                 "message": "endless array",
                 "code": start_cursor
