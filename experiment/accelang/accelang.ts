@@ -349,7 +349,7 @@ module accelang
             return JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
         }
 
-        getValueAndSeek() : any
+        getValueAndSeek(reviver : (key : string |null, value : object, location : AmpParseCodeCursor) => any = null) : any
         {
             let result = undefined;
             const getValueMethods =
@@ -358,7 +358,7 @@ module accelang
                 () => this.getStringAndSeek(),
                 () => this.getNumberAndSeek(),
                 () => this.getArayAndSeek(),
-                () => this.getObjectAndSeek()
+                () => this.getObjectAndSeek(reviver)
             ];
             for (let i = 0; i < getValueMethods.length && undefined === result; ++i)
             {
@@ -425,7 +425,7 @@ module accelang
             return result;
         }
 
-        getObjectAndSeek() : any
+        getObjectAndSeek(reviver : (key : string |null, value : object, location : AmpParseCodeCursor) => any = null) : any
         {
             if ("{" !== this.getChar())
             {
@@ -469,7 +469,8 @@ module accelang
                         };
                     }
 
-                    let value = this.next().skipWhiteSpace().ifEndThenThrow(endless_object_exception).getValueAndSeek();
+                    const cursor = this.next().skipWhiteSpace().ifEndThenThrow(endless_object_exception).cursor;
+                    let value = this.getValueAndSeek(reviver);
                     if (undefined === value)
                     {
                         throw {
@@ -481,7 +482,7 @@ module accelang
                             }
                         };
                     }
-                    result[key] = value;
+                    result[key] = reviver ? reviver(key, value, cursor): value;
                     
                     const char = this.skipWhiteSpace().ifEndThenThrow(endless_object_exception).getChar();
                     if ("}" === char)
