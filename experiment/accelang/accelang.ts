@@ -68,6 +68,8 @@ module accelang
         }
     }
 
+    type  reviver_type = (key : string |null, value : object, location : AmpParseCodeCursor) => any;
+
     class AmpCodeLocation
     {
         filepath : string;
@@ -216,7 +218,7 @@ module accelang
             return result;
         }
 
-        getReservedLiteralAndSeek(key : string, reviver : (key : string |null, value : object, location : AmpParseCodeCursor) => any = null) : any
+        getReservedLiteralAndSeek(key : string, reviver : reviver_type = null) : any
         {
             const start_cursor = deepCopy(this.cursor);
             const reservedLiterals =
@@ -238,7 +240,7 @@ module accelang
             return undefined;
         }
 
-        getStringAndSeek(key : string, reviver : (key : string |null, value : object, location : AmpParseCodeCursor) => any = null) : string
+        getStringAndSeek(key : string, reviver : reviver_type = null) : string
         {
             if ("\"" !== this.getChar())
             {
@@ -292,7 +294,7 @@ module accelang
             return null === reviver ? value: reviver(key, value, start_cursor);
         }
 
-        getNumberAndSeek(key : string, reviver : (key : string |null, value : object, location : AmpParseCodeCursor) => any = null) : string
+        getNumberAndSeek(key : string, reviver : reviver_type = null) : string
         {
             const start_cursor = deepCopy(this.cursor);
             let char = this.getChar();
@@ -353,7 +355,7 @@ module accelang
             return null === reviver ? value: reviver(key, value, start_cursor);
         }
 
-        getValueAndSeek(key : string, reviver : (key : string |null, value : object, location : AmpParseCodeCursor) => any = null) : any
+        getValueAndSeek(key : string, reviver : reviver_type = null) : any
         {
             let result = undefined;
             const getValueMethods =
@@ -371,7 +373,7 @@ module accelang
             return result;
         }
 
-        getArayAndSeek(key : string, reviver : (key : string |null, value : object, location : AmpParseCodeCursor) => any = null) : any
+        getArayAndSeek(key : string, reviver : reviver_type = null) : any
         {
             if ("[" !== this.getChar())
             {
@@ -429,7 +431,7 @@ module accelang
             return null === reviver ? result: reviver(key, result, start_cursor);
         }
 
-        getObjectAndSeek(key : string, reviver : (key : string |null, value : object, location : AmpParseCodeCursor) => any = null) : any
+        getObjectAndSeek(key : string, reviver : reviver_type = null) : any
         {
             if ("{" !== this.getChar())
             {
