@@ -69,24 +69,27 @@ module accelang
     }
 
     //  最初の２引数は標準の JSON.parse() の reviver への引数に合わせている
-    type  reviver_type = (key : string, value : object, path : string[], location : AmpParseCodeCursor) => any;
+    type  reviver_type = (key : string, value : object, location : AmpParseCodeCursor) => any;
 
     class AmpCodeLocation
     {
         filepath : string;
         line : number;
         row : number;
+        codepath : string[];
 
         constructor
         (
             filepath : string,
             line : number = 1,
-            row : number = 1
+            row : number = 1,
+            codepath : string[] = []
         )
         {
             this.filepath = filepath;
             this.line = line;
             this.row = row;
+            this.codepath = codepath;
         }
 
         nextLine() : AmpCodeLocation
@@ -219,7 +222,7 @@ module accelang
             return result;
         }
 
-        getReservedLiteralAndSeek(path : string[], key : string, reviver : reviver_type = null) : any
+        getReservedLiteralAndSeek(key : string, reviver : reviver_type = null) : any
         {
             const start_cursor = deepCopy(this.cursor);
             const reservedLiterals =
@@ -234,14 +237,14 @@ module accelang
                 if (this.isMatchAndSeek(reserved_literal))
                 {
                     const value = JSON.parse(reserved_literal);
-                    return null === reviver ? value: reviver(key, value, path, start_cursor);
+                    return null === reviver ? value: reviver(key, value, start_cursor);
                 }
             }
            
             return undefined;
         }
 
-        getStringAndSeek(path : string[], key : string, reviver : reviver_type = null) : string
+        getStringAndSeek(key : string, reviver : reviver_type = null) : string
         {
             if ("\"" !== this.getChar())
             {
@@ -253,7 +256,7 @@ module accelang
             {
                 "&A": "error",
                 "message": "endless string",
-                "code": start_cursor
+                "location": start_cursor
             };
             this.next();
             while(true)
@@ -292,10 +295,10 @@ module accelang
                 }
             }
             const value = JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
-            return null === reviver ? value: reviver(key, value, path, start_cursor);
+            return null === reviver ? value: reviver(key, value, start_cursor);
         }
 
-        getNumberAndSeek(path : string[], key : string, reviver : reviver_type = null) : string
+        getNumberAndSeek(key : string, reviver : reviver_type = null) : string
         {
             const start_cursor = deepCopy(this.cursor);
             let char = this.getChar();
@@ -353,19 +356,19 @@ module accelang
             }
 
             const value = JSON.parse(this.code.substr(start_cursor.i, this.cursor.i -start_cursor.i));
-            return null === reviver ? value: reviver(key, value, path, start_cursor);
+            return null === reviver ? value: reviver(key, value, start_cursor);
         }
 
-        getValueAndSeek(path : string[], key : string, reviver : reviver_type = null) : any
+        getValueAndSeek(key : string, reviver : reviver_type = null) : any
         {
             let result = undefined;
             const getValueMethods =
             [
-                () => this.getReservedLiteralAndSeek(path, key, reviver),
-                () => this.getStringAndSeek(path, key, reviver),
-                () => this.getNumberAndSeek(path, key, reviver),
-                () => this.getArayAndSeek(path, key, reviver),
-                () => this.getObjectAndSeek(path, key, reviver)
+                () => this.getReservedLiteralAndSeek(key, reviver),
+                () => this.getStringAndSeek(key, reviver),
+                () => this.getNumberAndSeek(key, reviver),
+                () => this.getArayAndSeek(key, reviver),
+                () => this.getObjectAndSeek(key, reviver)
             ];
             for (let i = 0; i < getValueMethods.length && undefined === result; ++i)
             {
@@ -374,7 +377,7 @@ module accelang
             return result;
         }
 
-        getArayAndSeek(path : string[], key : string, reviver : reviver_type = null) : any
+        getArayAndSeek(key : string, reviver : reviver_type = null) : any
         {
             if ("[" !== this.getChar())
             {
@@ -389,13 +392,12 @@ module accelang
                 "message": "endless array",
                 "code": start_cursor
             };
-            const chilid_path = deepCopy(path);
-            chilid_path.push(key);
+            this.cursor.location.codepath.push(key);
             if ("]" !== this.next().skipWhiteSpace().ifEndThenThrow(endless_array_exception).getChar())
             {
                 while(true)
                 {
-                    let i = this.getValueAndSeek(chilid_path, result.length.toString(), reviver);
+                    let i = this.getValueAndSeek(result.length.toString(), reviver);
                     if (undefined === i)
                     {
                         throw {
@@ -429,11 +431,12 @@ module accelang
                 }
             }
             this.next();
+            this.cursor.location.codepath.pop();
 
-            return null === reviver ? result: reviver(key, result, path, start_cursor);
+            return null === reviver ? result: reviver(key, result, start_cursor);
         }
 
-        getObjectAndSeek(path : string[], key : string, reviver : reviver_type = null) : any
+        getObjectAndSeek(key : string, reviver : reviver_type = null) : any
         {
             if ("{" !== this.getChar())
             {
@@ -447,13 +450,12 @@ module accelang
                 "message": "endless object",
                 "code": start_cursor
             };
-            const chilid_path = deepCopy(path);
-            chilid_path.push(key);
+            this.cursor.location.codepath.push(key);
             if ("}" !== this.next().skipWhiteSpace().ifEndThenThrow(endless_object_exception).getChar())
             {
                 while(true)
                 {
-                    let key = this.getStringAndSeek(null, "", null);
+                    let key = this.getStringAndSeek("", null);
                     if (undefined === key)
                     {
                         throw {
@@ -478,8 +480,7 @@ module accelang
                         };
                     }
 
-                    const cursor = this.next().skipWhiteSpace().ifEndThenThrow(endless_object_exception).cursor;
-                    let value = this.getValueAndSeek(chilid_path, key, reviver);
+                    let value = this.next().skipWhiteSpace().ifEndThenThrow(endless_object_exception).getValueAndSeek(key, reviver);
                     if (undefined === value)
                     {
                         throw {
@@ -513,24 +514,32 @@ module accelang
                 }
             }
             this.next();
+            this.cursor.location.codepath.pop();
 
-            return null === reviver ? result: reviver(key, result, path, start_cursor);
+            return null === reviver ? result: reviver(key, result, start_cursor);
         }
 
     }
 
     export function parseCode(cursor : AmpParseCodeCursor, code : string) : object
     {
-        //return JSON.parse(code);
-        const empty_json_exception =
-        {
-            "&A": "error",
-            "message": "empty json",
-            "code": cursor.location.filepath
-        };
-
         const parser = new AmpParseCode(cursor, code);
-        const result = parser.skipWhiteSpace().ifEndThenThrow(empty_json_exception).getValueAndSeek([], "");
+        const result = parser
+            .skipWhiteSpace()
+            .ifEndThenThrow
+            ({
+                "&A": "error",
+                "message": "empty json",
+                "code": cursor.location.filepath
+            })
+            .getValueAndSeek
+            (
+                "",
+                (_key, value, _location) =>
+                {
+                    return value;
+                }
+            );
         parser.skipWhiteSpace();
         if (!parser.isEnd())
         {
