@@ -69,7 +69,7 @@ module accelang
     }
 
     //  最初の２引数は標準の JSON.parse() の reviver への引数に合わせている
-    type  reviver_type = (key : string, value : object, location : AmpParseCodeCursor) => any;
+    type  reviver_type = (key : string, value : object, cursor : AmpParseCodeCursor) => any;
 
     class AmpCodeLocation
     {
@@ -119,6 +119,7 @@ module accelang
     {
         cursor : AmpParseCodeCursor;
         code : string;
+        codeLocationMap : { [name: string] : AmpParseCodeCursor };
 
         constructor
         (
@@ -128,6 +129,7 @@ module accelang
         {
             this.cursor = cursor;
             this.code =code;
+            this.codeLocationMap = {};
         }
 
         getChar() : string
@@ -535,8 +537,11 @@ module accelang
             .getValueAndSeek
             (
                 "",
-                (_key, value, _location) =>
+                (key, value, cursor) =>
                 {
+                    const codepath = deepCopy(cursor.location.codepath);
+                    codepath.push(key);
+                    parser.codeLocationMap[JSON.stringify(codepath)] = deepCopy(cursor);
                     return value;
                 }
             );
@@ -552,7 +557,11 @@ module accelang
                 }
             };
         }
-        return result;
+        return {
+            "&A": "file",
+            "coee": result,
+            "codeLocationMap": parser.codeLocationMap
+        };
     }
     export function parseFile(filepath : string, code : string) : object
     {
