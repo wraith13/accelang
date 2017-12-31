@@ -119,7 +119,6 @@ module accelang
     {
         cursor : AmpParseCodeCursor;
         code : string;
-        codeLocationMap : { [name: string] : AmpParseCodeCursor };
 
         constructor
         (
@@ -129,7 +128,6 @@ module accelang
         {
             this.cursor = cursor;
             this.code =code;
-            this.codeLocationMap = {};
         }
 
         getChar() : string
@@ -526,6 +524,7 @@ module accelang
     export function parseCode(cursor : AmpParseCodeCursor, code : string) : object
     {
         const parser = new AmpParseCode(cursor, code);
+        var codeLocationMap : { [name: string] : AmpParseCodeCursor } = {};
         const result = parser
             .skipWhiteSpace()
             .ifEndThenThrow
@@ -541,7 +540,7 @@ module accelang
                 {
                     const codepath = deepCopy(cursor.location.codepath);
                     codepath.push(key);
-                    parser.codeLocationMap[JSON.stringify(codepath)] = deepCopy(cursor);
+                    codeLocationMap[JSON.stringify(codepath)] = deepCopy(cursor);
                     return value;
                 }
             );
@@ -560,7 +559,7 @@ module accelang
         return {
             "&A": "file",
             "coee": result,
-            "codeLocationMap": parser.codeLocationMap
+            "codeLocationMap": codeLocationMap
         };
     }
     export function parseFile(filepath : string, code : string) : object
