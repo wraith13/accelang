@@ -263,6 +263,7 @@ module accelang
                 this.next();
                 while(true)
                 {
+                    const current_cursor = deepCopy(this.cursor);
                     let char = this.ifEndThenThrow(endless_string_exception).getCharAndSeek();
                     if ("\"" === char)
                     {
@@ -283,14 +284,33 @@ module accelang
                         {
                             if ("u" === trail_char)
                             {
-                                //  4桁の16進コードのチェック
+                                const length = 4;
+                                const hexCode = this.getSubStr(length).toLowerCase();
+                                const illegal_u_escape_exception =
+                                {
+                                    "&A": "error",
+                                    "message": "illegal escape ( expected 4 hex dicimal chars after '\\u' )",
+                                    "code": current_cursor
+                                };
+                                if (hexCode.length < length)
+                                {
+                                    throw illegal_u_escape_exception;
+                                }
+                                const hex = "0123456789abcdef";
+                                for(var i = 0; i < length; ++i)
+                                {
+                                    if (hex.indexOf(hexCode.substr(i, 1)) < 0)
+                                    {
+                                        throw illegal_u_escape_exception;
+                                    }
+                                }
                             }
                             else
                             {
                                 throw {
                                     "&A": "error",
-                                    "message": "illegal escape ( expected '\"', '\\', '/', 'b', 'f', 'n', 'f', 'r', 't', 'u' )",
-                                    "code": this.cursor
+                                    "message": "illegal escape ( expected '\"', '\\', '/', 'b', 'f', 'n', 'f', 'r', 't', 'u' after '\\' )",
+                                    "code": current_cursor
                                 };
                             }
                         }
