@@ -10,6 +10,14 @@ function getSourcodeElement() : HTMLTextAreaElement
 {
     return <HTMLTextAreaElement>document.getElementsByTagName("textarea")[0];
 }
+function getIndicatorElement() : HTMLSpanElement
+{
+    return <HTMLSpanElement>document.getElementsByClassName("indicator")[0];
+}
+function getRunElement() : HTMLSpanElement
+{
+    return <HTMLSpanElement>document.getElementsByClassName("run")[0];
+}
 function getOutputElement() : HTMLElement
 {
     return <HTMLElement>document.getElementsByClassName("xxx")[0];
@@ -52,7 +60,12 @@ setTimeout
         );
         fillHeight();
         window.onresize = fillHeight;
-        (<HTMLElement>document.getElementsByClassName("run")[0]).onclick = run;
+        getRunElement().onclick = run;
+        //getSourcodeElement().onchange = updateEditorIndicator;
+        getSourcodeElement().onkeydown = updateEditorIndicator;
+        getSourcodeElement().onkeyup = updateEditorIndicator;
+        getSourcodeElement().onmousedown = updateEditorIndicator;
+        getSourcodeElement().onmouseup = updateEditorIndicator;
     },
     10
 );
@@ -155,4 +168,24 @@ function run() : void
             )
         );
     }
+}
+
+function countLocation(text : string) : { line : number, row : number }
+{
+    const lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n");
+    return {
+        line: lines.length,
+        row: lines.pop().length +1
+    };
+}
+
+function updateEditorIndicator() : void
+{
+    const location = countLocation
+    (
+        getSourcodeElement()
+            .value
+            .substr(0, getSourcodeElement().selectionStart)
+    );
+    getIndicatorElement().innerText = `${location.line},${location.row}`;
 }
