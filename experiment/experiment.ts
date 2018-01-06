@@ -172,7 +172,7 @@ function run() : void
 
 function countLocation(text : string) : { line : number, row : number }
 {
-    const lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n");
+    const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
     return {
         line: lines.length,
         row: lines.pop().length +1
