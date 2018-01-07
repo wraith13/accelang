@@ -44,6 +44,38 @@ module accelang
         return JSON.parse(JSON.stringify(source));
     }
         
+    export function objectAssign(target : object, ... sources : object[]) : object
+    {
+        //  copy from https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
+        if (typeof Object.assign !== 'function') {
+            (function () {
+                Object.assign = function (target) {
+                'use strict';
+                if (target === undefined || target === null) {
+                    throw new TypeError('Cannot convert undefined or null to object');
+                }
+                var output = Object(target);
+                for (var index = 1; index < arguments.length; index++) {
+                    var source = arguments[index];
+                    if (source !== undefined && source !== null) {
+                        for (var nextKey in source) {
+                            if (Object.prototype.hasOwnProperty.call(source, nextKey)) {
+                                output[nextKey] = source[nextKey];
+                            }
+                        }
+                    }
+                }
+                return output;
+                };
+            })();
+        }
+
+        sources.forEach(i => {
+            Object.assign(target, i);
+        });
+        return target;
+    }
+        
     class AmpVersion
     {
         constructor
@@ -68,55 +100,56 @@ module accelang
         }
     }
 
+    export class AmpCodeLocation
+    {
+        filepath : string;
+        line : number;
+        row : number;
+        codepath : string[];
+
+        constructor
+        (
+            filepath : string,
+            line : number = 1,
+            row : number = 1,
+            codepath : string[] = []
+        )
+        {
+            this.filepath = filepath;
+            this.line = line;
+            this.row = row;
+            this.codepath = codepath;
+        }
+
+        nextLine() : AmpCodeLocation
+        {
+            this.line++;
+            this.row = 1;
+            return this;
+        }
+    }
+
+    export class AmpCodeCursor
+    {
+        location : AmpCodeLocation;
+        i : number;
+
+        constructor
+        (
+            location : AmpCodeLocation,
+            i : number = 0
+        )
+        {
+            this.location = location;
+            this.i = i;
+        }
+    }
+
     module AmpJsonParser
     {
         //  最初の２引数は標準の JSON.parse() の reviver への引数に合わせている
         type  reviver_type = (key : string, value : object, cursor : AmpCodeCursor) => any;
 
-        export class AmpCodeLocation
-        {
-            filepath : string;
-            line : number;
-            row : number;
-            codepath : string[];
-    
-            constructor
-            (
-                filepath : string,
-                line : number = 1,
-                row : number = 1,
-                codepath : string[] = []
-            )
-            {
-                this.filepath = filepath;
-                this.line = line;
-                this.row = row;
-                this.codepath = codepath;
-            }
-    
-            nextLine() : AmpCodeLocation
-            {
-                this.line++;
-                this.row = 1;
-                return this;
-            }
-        }
-    
-        export class AmpCodeCursor
-        {
-            location : AmpCodeLocation;
-            i : number;
-
-            constructor
-            (
-                location : AmpCodeLocation,
-                i : number = 0
-            )
-            {
-                this.location = location;
-                this.i = i;
-            }
-        }
         export class AmpParseCode
         {
             cursor : AmpCodeCursor;
@@ -546,8 +579,8 @@ module accelang
 
     export function parseFile(filepath : string, code : string) : object
     {
-        const parser = new AmpJsonParser.AmpParseCode(new AmpJsonParser.AmpCodeCursor(new AmpJsonParser.AmpCodeLocation(filepath)), code);
-        var codeLocationMap : { [name: string] : AmpJsonParser.AmpCodeCursor } = {};
+        const parser = new AmpJsonParser.AmpParseCode(new AmpCodeCursor(new AmpCodeLocation(filepath)), code);
+        var codeLocationMap : { [name: string] : AmpCodeCursor } = {};
         const result = parser
             .skipWhiteSpace()
             .ifEndThenThrow
@@ -581,7 +614,7 @@ module accelang
         }
         return {
             "&A": "file",
-            "coee": result,
+            "code": result,
             "codeLocationMap": codeLocationMap
         };
     }
@@ -639,6 +672,7 @@ module accelang
         profiling : object[] = [];
         footstamp : object[] = [];
         coverage : object[] = [];
+        codeLocationMap : { [name: string] : AmpCodeCursor } = {};
 
         log : (text : string) => void = (text : string) => console.log(text);
         error : (text : string) => void = (text : string) => console.error(text);
@@ -704,6 +738,11 @@ module accelang
     
                     case "error":
                         result = code;
+                        break;
+    
+                    case "file":
+                        result = code["code"];
+                        objectAssign(this.codeLocationMap, code["codeLocationMap"]);
                         break;
     
                     default:
