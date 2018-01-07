@@ -43,7 +43,7 @@ module accelang
     {
         return JSON.parse(JSON.stringify(source));
     }
-        
+    
     export function objectAssign(target : object, ... sources : object[]) : object
     {
         //  copy from https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
@@ -594,9 +594,14 @@ module accelang
                 "",
                 (key, value, cursor) =>
                 {
-                    const codepath = deepCopy(cursor.location.codepath);
-                    codepath.push(key);
-                    codeLocationMap[JSON.stringify(codepath)] = deepCopy(cursor);
+                    codeLocationMap
+                    [
+                        JSON.stringify
+                        (
+                            cursor.location.codepath.concat(key)
+                        )
+                    ]
+                    = deepCopy(cursor);
                     return value;
                 }
             );
@@ -672,7 +677,7 @@ module accelang
         profiling : object[] = [];
         footstamp : object[] = [];
         coverage : object[] = [];
-        codeLocationMap : { [name: string] : AmpCodeCursor } = {};
+        codeCursorMap : { [name: string] : AmpCodeCursor } = {};
 
         log : (text : string) => void = (text : string) => console.log(text);
         error : (text : string) => void = (text : string) => console.error(text);
@@ -682,14 +687,16 @@ module accelang
             this.version = version;
         }
 
-        makeError(message : string, code : object = null) : object
+        makeError(message : string, code : object = null, codepath : string[] = null) : object
         {
             console.trace();
             this.error(message);
+            console.log("load: " +JSON.stringify(codepath));
             return {
                 "&A": "error",
                 "message": message,
-                "code": code
+                "code": code,
+                "cursor": codepath && this.codeCursorMap[JSON.stringify(codepath)]
             };
         }
 
@@ -713,7 +720,7 @@ module accelang
 //        
 //    }
 
-        loadCore(code : object) : object
+        loadCore(codepath : string[], code : object) : object
         {
             //  この関数の役割は全てのコードおよびデータをコードからアクセス可能な状態にすること。
             //  シンタックスエラーの類いの検出はこの関数内で行ってしまう。
@@ -742,11 +749,11 @@ module accelang
     
                     case "file":
                         result = code["code"];
-                        objectAssign(this.codeLocationMap, code["codeLocationMap"]);
+                        objectAssign(this.codeCursorMap, code["codeLocationMap"]);
                         break;
     
                     default:
-                        result = this.makeError(`uknown type error: ${type}`, code);
+                        result = this.makeError(`uknown type error: ${type}`, code, codepath);
                     }
                     break;
                     
@@ -768,6 +775,7 @@ module accelang
             //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
             return this.loadCore
             (
+                [""],
                 parseFile(filepath, code)
             );
         }
@@ -782,6 +790,7 @@ module accelang
             (
                 this.loadCore
                 (
+                    [""],
                     this.preprocess
                     (
                         this.preload(filepath, code),
