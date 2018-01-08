@@ -753,7 +753,12 @@ module accelang
                         break;
     
                     default:
-                        result = this.makeError(`uknown type error: ${type}`, code, codepath.concat("&A"));
+                        result = this.makeError
+                        (
+                            `uknown type error: ${type}`,
+                            code,
+                            codepath.concat("&A")
+                        );
                     }
                     break;
                     
@@ -764,7 +769,12 @@ module accelang
                     }
     
                 default:
-                    result = this.makeError(`format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`, code);
+                    result = this.makeError
+                    (
+                        `format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`,
+                        code,
+                        codepath.concat("&A")
+                    );
                 }
             }
             return result;
