@@ -753,7 +753,7 @@ module accelang
                         break;
     
                     default:
-                        result = this.makeError(`uknown type error: ${type}`, code, codepath);
+                        result = this.makeError(`uknown type error: ${type}`, code, codepath.concat("&A"));
                     }
                     break;
                     
