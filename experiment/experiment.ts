@@ -22,6 +22,10 @@ function getOutputElement() : HTMLElement
 {
     return <HTMLElement>document.getElementsByClassName("xxx")[0];
 }
+function getMachineElement() : HTMLElement
+{
+    return <HTMLElement>document.getElementsByClassName("machine")[0];
+}
 
 class CreateElementArg
 {
@@ -74,7 +78,8 @@ function fillHeight() : void
 {
     const list = [
         getSourcodeElement(),
-        getOutputElement()
+        getOutputElement(),
+        getMachineElement()
     ];
     if (convertRemToPixels(80) <= document.body.clientWidth)
     {
@@ -100,6 +105,7 @@ function select(url : string) : void
 function run() : void
 {
     getOutputElement().innerHTML = "";
+    getMachineElement().innerHTML = "";
     const machine = new accelang.AmpMachine();
     
     machine.log = (text : string) : void =>
@@ -168,6 +174,17 @@ function run() : void
             )
         );
     }
+    getMachineElement().appendChild
+    (
+        createElement
+        (
+            {
+                tag:"div",
+                className:"log",
+                innerText:JSON.stringify(machine, null, 4)
+            }
+        )
+    );
 }
 
 function countLocation(text : string) : { line : number, row : number }
