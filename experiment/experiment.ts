@@ -6,6 +6,27 @@ function convertRemToPixels(rem : number) :number
     return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
 }
 
+function elementMap<T>(elements : NodeListOf<Element>, map : (Element) => T = i => i) : T[]
+{
+    const result : T[] = [];
+    for(var i = 0; i < elements.length; ++i)
+    {
+        result.push(map(elements[i]));
+    }
+    return result;
+}
+
+function getElementsByClassNameList(classNameList :  string[], parent : Element = document.documentElement) : Element[]
+{
+    const list = accelang.deepCopy(classNameList);
+    var result : Element[] = elementMap(parent.getElementsByClassName(list.shift()));
+    if (0 < list.length)
+    {
+        result = result.map(i => getElementsByClassNameList(list, i)).reduce((i,j) => i.concat(j));
+    }
+    return result;
+}
+
 function getSourcodeElement() : HTMLTextAreaElement
 {
     return <HTMLTextAreaElement>document.getElementsByTagName("textarea")[0];
@@ -20,11 +41,11 @@ function getRunElement() : HTMLSpanElement
 }
 function getOutputElement() : HTMLElement
 {
-    return <HTMLElement>document.getElementsByClassName("xxx")[0];
+    return <HTMLElement>getElementsByClassNameList(["output", "view"])[0];
 }
 function getMachineElement() : HTMLElement
 {
-    return <HTMLElement>document.getElementsByClassName("machine")[0];
+    return <HTMLElement>getElementsByClassNameList(["machine", "view"])[0];
 }
 
 class CreateElementArg

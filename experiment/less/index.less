@@ -23,8 +23,7 @@
     }
     & > .container
     {
-        & > .xxx,
-        & > .machine
+        & > .view
         {
             background-color: #DEFEEE;
             white-space: pre-wrap;
@@ -62,15 +61,9 @@
             {
                 flex-grow: 1;
             }
-            &.source
-            {
-                flex-grow: 4;
-            }
-            &.output
-            {
-                flex-grow: 4;
-            }
-            &.environment
+            &.source,
+            &.output,
+            &.machine
             {
                 flex-grow: 4;
             }
