@@ -102,6 +102,18 @@ function select(url : string) : void
     );
 }
 
+function objectToHtml(obj : object): Element
+{
+    return createElement
+    (
+        {
+            tag:"div",
+            className:"log",
+            innerText:JSON.stringify(obj, null, 4)
+        }
+    );
+}
+
 function run() : void
 {
     getOutputElement().innerHTML = "";
@@ -174,17 +186,7 @@ function run() : void
             )
         );
     }
-    getMachineElement().appendChild
-    (
-        createElement
-        (
-            {
-                tag:"div",
-                className:"log",
-                innerText:JSON.stringify(machine, null, 4)
-            }
-        )
-    );
+    getMachineElement().appendChild(objectToHtml(machine));
 }
 
 function countLocation(text : string) : { line : number, row : number }
