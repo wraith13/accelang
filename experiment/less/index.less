@@ -50,24 +50,31 @@
                 }
                 .property > div
                 {
-                    display: inline-block;
-    
                     &.key
                     {
+                        display: inline-block;
                         vertical-align: top;
-                        width: 8.0rem;
+                        width: 6.0rem;
                         overflow-x: visible;
+                    }
+                    &:not(.key):not(.object):not(.array)
+                    {
+                        display: block;
+                        margin-top: -1.0rem;
+                        margin-left: 6.0rem;
                     }
                     &.object,
                     &.array
                     {
-                        margin-top: 1.0rem;
-                        margin-left: -8.0rem;
+                        xmargin-top: 1.0rem;
+                        xmargin-left: -6.0rem;
                     }
+                    /*
                     &:not(key)
                     {
                         min-width: 10.0rem;
                     }
+                    */
                 }
 
                 div.key
