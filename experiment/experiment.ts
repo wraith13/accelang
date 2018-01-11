@@ -32,6 +32,7 @@ class CreateElementArg
     tag : string;
     className ?: string;
     innerText ?: string;
+    children ?: HTMLElement[];
 }
 function createElement(arg : CreateElementArg) : HTMLElement
 {
@@ -43,6 +44,12 @@ function createElement(arg : CreateElementArg) : HTMLElement
     if (undefined !== arg.innerText)
     {
         element.innerText = arg.innerText;
+    }
+    if (undefined !== arg.children)
+    {
+        arg.children.forEach(i => {
+            element.appendChild(i);
+        });
     }
     return element;
 }
@@ -102,16 +109,94 @@ function select(url : string) : void
     );
 }
 
-function objectToHtml(obj : object): Element
+function isArray(obj : object) : boolean
+{
+    return undefined !== obj &&
+        null !== obj &&
+        "string" !== typeof obj &&
+        "[object Array]" === Object.prototype.toString.call(obj);
+}
+
+function arrayToHtml(array : object[]): HTMLElement
 {
     return createElement
     (
         {
+            tag: "div",
+            className: "array",
+            children: array.map(i => anyToHtml(i))
+        }
+    );
+}
+
+function objectToHtml(obj : object): HTMLElement
+{
+    const children : HTMLElement[] = [];
+    for(var key in obj)
+    {
+        if (obj.hasOwnProperty(key))
+        {
+            children.push
+            (
+                createElement
+                (
+                    {
+                        tag:"div",
+                        className:"property",
+                        children:
+                        [
+                            createElement
+                            (
+                                {
+                                    tag:"div",
+                                    className:"key",
+                                    innerText: key
+                                }
+                            ),
+                            anyToHtml(obj[key])
+                        ]
+                    }
+                )
+            );
+        }
+    }
+    return createElement
+    (
+        {
             tag:"div",
-            className:"log",
+            className:"object",
+            children: children
+        }
+    );
+}
+
+function valueToHtml(obj : object): HTMLElement
+{
+    console.log("value_type: " +typeof obj);
+    return createElement
+    (
+        {
+            tag:"div",
+            className: typeof obj,
             innerText:JSON.stringify(obj, null, 4)
         }
     );
+}
+
+function anyToHtml(obj : any): HTMLElement
+{
+    if (undefined !== obj && null !== obj)
+    {
+        if (isArray(obj))
+        {
+            return arrayToHtml(<object[]>obj);
+        }
+        if ("object" === typeof obj)
+        {
+            return objectToHtml(obj);
+        }
+    }
+    return valueToHtml(obj);
 }
 
 function run() : void
