@@ -34,9 +34,56 @@
                 color: #E04040;
             }
 
-            .object
+            &#machine
             {
-                padding-left: 1.0rem;
+                line-height: 1rem;
+
+                .array,
+                .object
+                {
+                    display: block;
+                    padding-left: 1.0rem;
+                }
+                .property
+                {
+                    display: block;
+                }
+                .property > div
+                {
+                    display: inline-block;
+    
+                    &.key
+                    {
+                        vertical-align: top;
+                        width: 8.0rem;
+                        overflow-x: visible;
+                    }
+                    &.object,
+                    &.array
+                    {
+                        margin-top: 1.0rem;
+                        margin-left: -8.0rem;
+                    }
+                    &:not(key)
+                    {
+                        min-width: 10.0rem;
+                    }
+                }
+
+                div.key
+                {
+                    background: -prefix-linear-gradient(left top, #CCEEEE, #FFFFFF);
+                    background: linear-gradient(to bottom right, #CCEEEE, #FFFFFF);
+                }
+                div:not(.property):not(.key)
+                {
+                    //border-width: 1px;
+                    //border-style: solid;
+                    //border-color: #FFFFFF;
+                    //padding: 0.1rem;
+                    background: -prefix-linear-gradient(left top, #DEFEEE, #FFFFFF);
+                    background: linear-gradient(to bottom right, #DEFEEE, #FFFFFF);
+                }
             }
         }
     }

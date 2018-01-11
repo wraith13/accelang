@@ -172,7 +172,6 @@ function objectToHtml(obj : object): HTMLElement
 
 function valueToHtml(obj : object): HTMLElement
 {
-    console.log("value_type: " +typeof obj);
     return createElement
     (
         {
