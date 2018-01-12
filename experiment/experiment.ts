@@ -150,7 +150,7 @@ function objectToHtml(obj : object): HTMLElement
                                 {
                                     tag:"div",
                                     className:"key",
-                                    innerText: key
+                                    innerText: JSON.stringify(key)
                                 }
                             ),
                             anyToHtml(obj[key])

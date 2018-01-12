@@ -36,17 +36,26 @@
 
             &#machine
             {
-                line-height: 1rem;
+                line-height: 1.0rem;
 
-                .array,
-                .object
+                .array:not(:empty),
+                .object:not(:empty)
                 {
                     display: block;
                     padding-left: 1.0rem;
                 }
+                .array:empty:before
+                {
+                    content: "[]";
+                }
+                .object:empty:before
+                {
+                    content: "{}";
+                }
                 .property
                 {
                     display: block;
+                    background-color: #FFFFFF;
                 }
                 .property > div
                 {
@@ -54,27 +63,18 @@
                     {
                         display: inline-block;
                         vertical-align: top;
-                        width: 6.0rem;
+                        width: @json-key-width;
                         overflow-x: visible;
+                        white-space: nowrap;
                     }
-                    &:not(.key):not(.object):not(.array)
+                    &:not(.key):not(.array):not(.object),
+                    &.array:empty:before,
+                    &.object:empty:before
                     {
                         display: block;
                         margin-top: -1.0rem;
-                        margin-left: 6.0rem;
+                        margin-left: @json-key-width;
                     }
-                    &.object,
-                    &.array
-                    {
-                        xmargin-top: 1.0rem;
-                        xmargin-left: -6.0rem;
-                    }
-                    /*
-                    &:not(key)
-                    {
-                        min-width: 10.0rem;
-                    }
-                    */
                 }
 
                 div.key
@@ -84,10 +84,6 @@
                 }
                 div:not(.property):not(.key)
                 {
-                    //border-width: 1px;
-                    //border-style: solid;
-                    //border-color: #FFFFFF;
-                    //padding: 0.1rem;
                     background: -prefix-linear-gradient(left top, #DEFEEE, #FFFFFF);
                     background: linear-gradient(to bottom right, #DEFEEE, #FFFFFF);
                 }
