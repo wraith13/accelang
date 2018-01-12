@@ -1,6 +1,14 @@
 @import "params.less";
 @import "template.less";
 
+@text-selectable:
+{
+    user-select: all;
+    -moz-user-select: all;
+    -webkit-user-select: all;
+    -ms-user-select: all;
+};
+
 #body > .container > .pane
 {
     width: 100vw;
@@ -42,15 +50,58 @@
                 .object:not(:empty)
                 {
                     display: block;
-                    padding-left: 1.0rem;
+                    & > div
+                    {
+                        margin-left: 1.0rem;
+                    }
                 }
-                .array:empty:before
+                .array:not(:empty)::before
                 {
+                    @text-selectable();
+                    content: "[";
+                }
+                .object:not(:empty)::before
+                {
+                    @text-selectable();
+                    content: "{";
+                }
+                .array:not(:empty)::after
+                {
+                    @text-selectable();
+                    content: "]";
+                }
+                .object:not(:empty)::after
+                {
+                    @text-selectable();
+                    content: "}";
+                }
+                .array:empty::before
+                {
+                    @text-selectable();
                     content: "[]";
                 }
-                .object:empty:before
+                .object:empty::before
                 {
+                    @text-selectable();
                     content: "{}";
+                }
+                .key::after
+                {
+                    @text-selectable();
+                    content: ":";
+                }
+                .array > *:not(:last-child)::after
+                {
+                    @text-selectable();
+                    content: ",";
+                }
+                .array > .array:not(:last-child)::after
+                {
+                    content: "],";
+                }
+                .array > .object:not(:last-child)::after
+                {
+                    content: "},";
                 }
                 .property
                 {
@@ -68,13 +119,26 @@
                         white-space: nowrap;
                     }
                     &:not(.key):not(.array):not(.object),
-                    &.array:empty:before,
-                    &.object:empty:before
+                    &.array:before,
+                    &.object:before
                     {
                         display: block;
                         margin-top: -1.0rem;
                         margin-left: @json-key-width;
                     }
+                }
+                .property:not(:last-child) > div:not(.key)::after
+                {
+                    @text-selectable();
+                    content: ",";
+                }
+                .property:not(:last-child) > .array:not(:empty)::after
+                {
+                    content: "],";
+                }
+                .property:not(:last-child) > .object:not(:empty)::after
+                {
+                    content: "},";
                 }
 
                 div.key
