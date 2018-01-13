@@ -109,12 +109,22 @@ function select(url : string) : void
     );
 }
 
-function isArray(obj : object) : boolean
+function practical_typeof(obj : any) : string
 {
-    return undefined !== obj &&
-        null !== obj &&
-        "string" !== typeof obj &&
-        "[object Array]" === Object.prototype.toString.call(obj);
+    if (undefined === obj)
+    {
+        return "undefined";
+    }
+    if (null === obj)
+    {
+        return "null";
+    }
+    if ("[object Array]" === Object.prototype.toString.call(obj))
+    {
+        return "array";
+    }
+
+    return typeof obj;
 }
 
 function arrayToHtml(array : object[]): HTMLElement
@@ -170,13 +180,26 @@ function objectToHtml(obj : object): HTMLElement
     );
 }
 
+function functionToHtml(obj : object): HTMLElement
+{
+    return createElement
+    (
+        {
+            tag:"div",
+            className: "function",
+            //innerText: JSON.stringify(obj.toString(), null, 4)
+            innerText: "(...)"
+        }
+    );
+}
+
 function valueToHtml(obj : object): HTMLElement
 {
     return createElement
     (
         {
             tag:"div",
-            className: typeof obj,
+            className: practical_typeof(obj),
             innerText:JSON.stringify(obj, null, 4)
         }
     );
@@ -184,18 +207,17 @@ function valueToHtml(obj : object): HTMLElement
 
 function anyToHtml(obj : any): HTMLElement
 {
-    if (undefined !== obj && null !== obj)
+    switch(practical_typeof(obj))
     {
-        if (isArray(obj))
-        {
+        case "array":
             return arrayToHtml(<object[]>obj);
-        }
-        if ("object" === typeof obj)
-        {
+        case "object":
             return objectToHtml(obj);
-        }
+        case "function":
+            return functionToHtml(obj);
+        default:
+            return valueToHtml(obj);
     }
-    return valueToHtml(obj);
 }
 
 function run() : void
@@ -271,6 +293,7 @@ function run() : void
         );
     }
     getMachineElement().appendChild(objectToHtml(machine));
+    console.log(JSON.stringify(machine, null, 4));
 }
 
 function countLocation(text : string) : { line : number, row : number }
