@@ -39,10 +39,10 @@
                 line-height: 1.0rem;
 
                 .array:not(:empty),
-                .object:not(:empty)
+                .object:not(:empty),
                 {
                     display: block;
-                    & > div
+                    & > div:not(.end)
                     {
                         margin-left: 1.0rem;
                     }
@@ -63,11 +63,17 @@
                         white-space: nowrap;
                     }
                     &:not(.key):not(.array):not(.object),
+                    &:not(.key) > .begin,
                     &.empty
                     {
                         display: block;
                         margin-top: -1.0rem;
                         margin-left: @json-key-width;
+                    }
+                    &:not(.key) > .end
+                    {
+                        display: block;
+                        margin-left: 0.0rem;
                     }
                 }
                 div.key

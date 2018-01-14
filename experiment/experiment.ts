@@ -129,16 +129,43 @@ function practical_typeof(obj : any) : string
 
 function arrayToHtml(array : object[]): HTMLElement
 {
-    return 0 < array.length ?
-        createElement
+    if (0 < array.length)
+    {
+        const children : HTMLElement[] = array.map(i => anyToHtml(i));
+        children.unshift
+        (
+            createElement
+            (
+                {
+                    tag: "div",
+                    className: "begin",
+                    innerText: "["
+                }
+            )
+        );
+        children.push
+        (
+            createElement
+            (
+                {
+                    tag: "div",
+                    className: "end",
+                    innerText: "]"
+                }
+            )
+        );
+        return createElement
         (
             {
                 tag: "div",
                 className: "array",
-                children: array.map(i => anyToHtml(i))
+                children: children
             }
-        ):
-        createElement
+        );
+    }
+    else
+    {
+        return createElement
         (
             {
                 tag: "div",
@@ -146,6 +173,7 @@ function arrayToHtml(array : object[]): HTMLElement
                 innerText: "[ ]"
             }
         );
+    }
 }
 
 function objectToHtml(obj : object): HTMLElement
@@ -179,16 +207,42 @@ function objectToHtml(obj : object): HTMLElement
             );
         }
     }
-    return 0 < children.length ?
-        createElement
+    if (0 < children.length)
+    {
+        children.unshift
+        (
+            createElement
+            (
+                {
+                    tag: "div",
+                    className: "begin",
+                    innerText: "{"
+                }
+            )
+        );
+        children.push
+        (
+            createElement
+            (
+                {
+                    tag: "div",
+                    className: "end",
+                    innerText: "}"
+                }
+            )
+        );
+        return createElement
         (
             {
                 tag:"div",
                 className:"object",
                 children: children
             }
-        ):
-        createElement
+        );
+    }
+    else
+    {
+        return createElement
         (
             {
                 tag: "div",
@@ -196,6 +250,7 @@ function objectToHtml(obj : object): HTMLElement
                 innerText: "{ }"
             }
         );
+    }
 }
 
 function functionToHtml(obj : object): HTMLElement
