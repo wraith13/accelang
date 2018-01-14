@@ -129,14 +129,23 @@ function practical_typeof(obj : any) : string
 
 function arrayToHtml(array : object[]): HTMLElement
 {
-    return createElement
-    (
-        {
-            tag: "div",
-            className: "array",
-            children: array.map(i => anyToHtml(i))
-        }
-    );
+    return 0 < array.length ?
+        createElement
+        (
+            {
+                tag: "div",
+                className: "array",
+                children: array.map(i => anyToHtml(i))
+            }
+        ):
+        createElement
+        (
+            {
+                tag: "div",
+                className: "array empty",
+                innerText: "[ ]"
+            }
+        );
 }
 
 function objectToHtml(obj : object): HTMLElement
@@ -160,7 +169,7 @@ function objectToHtml(obj : object): HTMLElement
                                 {
                                     tag:"div",
                                     className:"key",
-                                    innerText: JSON.stringify(key)
+                                    innerText: JSON.stringify(key) +":"
                                 }
                             ),
                             anyToHtml(obj[key])
@@ -170,14 +179,23 @@ function objectToHtml(obj : object): HTMLElement
             );
         }
     }
-    return createElement
-    (
-        {
-            tag:"div",
-            className:"object",
-            children: children
-        }
-    );
+    return 0 < children.length ?
+        createElement
+        (
+            {
+                tag:"div",
+                className:"object",
+                children: children
+            }
+        ):
+        createElement
+        (
+            {
+                tag: "div",
+                className: "object empty",
+                innerText: "{ }"
+            }
+        );
 }
 
 function functionToHtml(obj : object): HTMLElement
