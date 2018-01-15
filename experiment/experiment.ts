@@ -132,11 +132,11 @@ function arrayToHtml(array : object[]): HTMLElement
     if (0 < array.length)
     {
         const children : HTMLElement[] = [];
-        for(var i = 0; i < array.length; ++i)
-        {
-            if (0 < children.length)
+        for(var i = 0; i < array.length; ++i) {
+            const property : HTMLElement[] = [anyToHtml(array[i])];
+            if ((i +1) < array.length)
             {
-                children.push
+                property.push
                 (
                     createElement
                     (
@@ -148,7 +148,17 @@ function arrayToHtml(array : object[]): HTMLElement
                     )
                 );
             }
-            children.push(anyToHtml(array[i]));
+            children.push
+            (
+                createElement
+                (
+                    {
+                        tag: "div",
+                        className: "property",
+                        children: property
+                    }
+                )
+            );
         }
         children.unshift
         (
@@ -175,8 +185,8 @@ function arrayToHtml(array : object[]): HTMLElement
         return createElement
         (
             {
-                tag: "div",
-                className: "array",
+                tag:"div",
+                className:"array",
                 children: children
             }
         );
@@ -196,14 +206,34 @@ function arrayToHtml(array : object[]): HTMLElement
 
 function objectToHtml(obj : object): HTMLElement
 {
-    const children : HTMLElement[] = [];
+    const properties : HTMLElement[][] = [];
     for(var key in obj)
     {
         if (obj.hasOwnProperty(key))
         {
-            if (0 < children.length)
+            properties.push
+            (
+                [
+                    createElement
+                    (
+                        {
+                            tag:"div",
+                            className:"key",
+                            innerText: JSON.stringify(key) +":"
+                        }
+                    ),
+                    anyToHtml(obj[key])
+                ]
+            );
+        }
+    }
+    if (0 < properties.length)
+    {
+        const children : HTMLElement[] = [];
+        for(var i = 0; i < properties.length; ++i) {
+            if ((i +1) < properties.length)
             {
-                children.push
+                properties[i].push
                 (
                     createElement
                     (
@@ -221,26 +251,12 @@ function objectToHtml(obj : object): HTMLElement
                 (
                     {
                         tag: "div",
-                        className:"property",
-                        children:
-                        [
-                            createElement
-                            (
-                                {
-                                    tag:"div",
-                                    className:"key",
-                                    innerText: JSON.stringify(key) +":"
-                                }
-                            ),
-                            anyToHtml(obj[key])
-                        ]
+                        className: "property",
+                        children: properties[i]
                     }
                 )
             );
         }
-    }
-    if (0 < children.length)
-    {
         children.unshift
         (
             createElement

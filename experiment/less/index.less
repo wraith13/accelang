@@ -38,13 +38,25 @@
             {
                 line-height: 1.0rem;
 
+                & > div.object:not(.begin) > div.begin
+                {
+                    display: block;
+                    margin-top: 0.0rem;
+                    margin-left: 0.0rem;
+                }
                 .array:not(:empty),
                 .object:not(:empty),
                 {
                     display: block;
-                    & > div:not(.end):not(.separator)
+                    & > div:not(.begin):not(.separator):not(.end)
                     {
                         margin-left: 1.0rem;
+                    }
+                    & > div.begin
+                    {
+                        display: block;
+                        margin-top: -1.0rem;
+                        margin-left: @json-key-width;
                     }
                     & > div.separator
                     {
@@ -55,40 +67,42 @@
                 {
                     display: block;
                     background-color: #FFFFFF;
-                }
-                .property > div
-                {
-                    &.key
+                    background: -prefix-linear-gradient(left top, #DEFEEE, #FFFFFF);
+                    background: linear-gradient(to bottom right, #DEFEEE, #FFFFFF);
+
+                    & > div
                     {
-                        display: inline-block;
-                        vertical-align: top;
-                        width: @json-key-width;
-                        overflow-x: visible;
-                        white-space: nowrap;
-                    }
-                    &:not(.key):not(.array):not(.object),
-                    &:not(.key) > .begin,
-                    &.empty
-                    {
-                        display: block;
-                        margin-top: -1.0rem;
-                        margin-left: @json-key-width;
-                    }
-                    &:not(.key) > .end
-                    {
-                        display: block;
-                        margin-left: 0.0rem;
+                        &.key
+                        {
+                            display: inline-block;
+                            vertical-align: top;
+                            width: @json-key-width;
+                            overflow-x: visible;
+                            white-space: nowrap;
+                        }
+                        &:not(.key):not(.array):not(.object),
+                        &:not(.key) > .begin,
+                        &.empty
+                        {
+                            display: inline-block;
+                            x-margin-top: -1.0rem;
+                            x-margin-left: @json-key-width;
+                        }
+                        &:not(.key) > .end
+                        {
+                            display: block;
+                            margin-left: 0.0rem;
+                        }
+                        & > div.separator
+                        {
+                            display: inline-block;
+                        }
                     }
                 }
                 div.key
                 {
                     background: -prefix-linear-gradient(left top, #CCEEEE, #FFFFFF);
                     background: linear-gradient(to bottom right, #CCEEEE, #FFFFFF);
-                }
-                div:not(.property):not(.key)
-                {
-                    background: -prefix-linear-gradient(left top, #DEFEEE, #FFFFFF);
-                    background: linear-gradient(to bottom right, #DEFEEE, #FFFFFF);
                 }
             }
         }
