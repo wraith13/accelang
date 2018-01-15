@@ -42,9 +42,13 @@
                 .object:not(:empty),
                 {
                     display: block;
-                    & > div:not(.end)
+                    & > div:not(.end):not(.separator)
                     {
                         margin-left: 1.0rem;
+                    }
+                    & > div.separator
+                    {
+                        display: inline-block;
                     }
                 }
                 .property

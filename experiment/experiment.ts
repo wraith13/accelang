@@ -131,7 +131,25 @@ function arrayToHtml(array : object[]): HTMLElement
 {
     if (0 < array.length)
     {
-        const children : HTMLElement[] = array.map(i => anyToHtml(i));
+        const children : HTMLElement[] = [];
+        for(var i = 0; i < array.length; ++i)
+        {
+            if (0 < children.length)
+            {
+                children.push
+                (
+                    createElement
+                    (
+                        {
+                            tag: "div",
+                            className:"separator",
+                            innerText: ","
+                        }
+                    )
+                );
+            }
+            children.push(anyToHtml(array[i]));
+        }
         children.unshift
         (
             createElement
@@ -183,12 +201,26 @@ function objectToHtml(obj : object): HTMLElement
     {
         if (obj.hasOwnProperty(key))
         {
+            if (0 < children.length)
+            {
+                children.push
+                (
+                    createElement
+                    (
+                        {
+                            tag: "div",
+                            className:"separator",
+                            innerText: ","
+                        }
+                    )
+                );
+            }
             children.push
             (
                 createElement
                 (
                     {
-                        tag:"div",
+                        tag: "div",
                         className:"property",
                         children:
                         [
