@@ -38,9 +38,13 @@
             {
                 line-height: 1.0rem;
 
+                div:not(.value)
+                {
+                    display: inline-block;
+                }
                 & > div.object:not(.begin) > div.begin
                 {
-                    display: block;
+                    x-display: block;
                     margin-top: 0.0rem;
                     margin-left: 0.0rem;
                 }
@@ -60,10 +64,15 @@
                     {
                         display: inline-block;
                     }
+
+                    .list .property:last-child > .value > .separator
+                    {
+                        display: none;
+                    }
                 }
                 .property
                 {
-                    display: block;
+                    x-display: block;
                     background-color: #FFFFFF;
                     background: -prefix-linear-gradient(left top, #DEFEEE, #FFFFFF);
                     background: linear-gradient(to bottom right, #DEFEEE, #FFFFFF);

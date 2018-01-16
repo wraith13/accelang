@@ -134,6 +134,7 @@ function arrayToHtml(array : object[]): HTMLElement
         const children : HTMLElement[] = [];
         for(var i = 0; i < array.length; ++i) {
             const property : HTMLElement[] = [anyToHtml(array[i])];
+            /*
             if ((i +1) < array.length)
             {
                 property.push
@@ -148,6 +149,7 @@ function arrayToHtml(array : object[]): HTMLElement
                     )
                 );
             }
+            */
             children.push
             (
                 createElement
@@ -231,6 +233,7 @@ function objectToHtml(obj : object): HTMLElement
     {
         const children : HTMLElement[] = [];
         for(var i = 0; i < properties.length; ++i) {
+            /*
             if ((i +1) < properties.length)
             {
                 properties[i].push
@@ -245,6 +248,7 @@ function objectToHtml(obj : object): HTMLElement
                     )
                 );
             }
+            */
             children.push
             (
                 createElement
@@ -268,6 +272,7 @@ function objectToHtml(obj : object): HTMLElement
                 }
             )
         );
+        /*
         children.push
         (
             createElement
@@ -279,6 +284,7 @@ function objectToHtml(obj : object): HTMLElement
                 }
             )
         );
+        */
         return createElement
         (
             {
@@ -319,7 +325,7 @@ function valueToHtml(obj : object): HTMLElement
     return createElement
     (
         {
-            tag:"div",
+            tag: "div",
             className: practical_typeof(obj),
             innerText:JSON.stringify(obj, null, 4)
         }
@@ -328,17 +334,41 @@ function valueToHtml(obj : object): HTMLElement
 
 function anyToHtml(obj : any): HTMLElement
 {
+    var value : HTMLElement;
     switch(practical_typeof(obj))
     {
         case "array":
-            return arrayToHtml(<object[]>obj);
+            value = arrayToHtml(<object[]>obj);
+            break;
         case "object":
-            return objectToHtml(obj);
+            value = objectToHtml(obj);
+            break;
         case "function":
-            return functionToHtml(obj);
+            value = functionToHtml(obj);
+            break;
         default:
-            return valueToHtml(obj);
+            value = valueToHtml(obj);
+            break;
     }
+    return createElement
+    (
+        {
+            tag: "div",
+            className: "value",
+            children:
+            [
+                value,
+                createElement
+                (
+                    {
+                        tag: "div",
+                        className:"separator",
+                        innerText: ","
+                    }
+                )
+            ]
+        }
+    );
 }
 
 function run() : void
