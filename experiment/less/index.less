@@ -54,9 +54,7 @@
                     }
                     & > div.begin
                     {
-                        display: block;
-                        margin-top: -1.0rem;
-                        margin-left: @json-key-width;
+                        display: inline-block;
                     }
                     & > div.separator
                     {
@@ -76,8 +74,8 @@
                         {
                             display: inline-block;
                             vertical-align: top;
-                            width: @json-key-width;
-                            overflow-x: visible;
+                            min-width: @json-key-width;
+                            x-overflow-x: visible;
                             white-space: nowrap;
                         }
                         &:not(.key):not(.array):not(.object),
@@ -88,9 +86,13 @@
                             x-margin-top: -1.0rem;
                             x-margin-left: @json-key-width;
                         }
+                        &:not(.key) > .end::before
+                        {
+                            clear: both;
+                        }
                         &:not(.key) > .end
                         {
-                            display: block;
+                            display: inline-block;
                             margin-left: 0.0rem;
                         }
                         & > div.separator
