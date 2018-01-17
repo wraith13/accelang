@@ -37,6 +37,7 @@
             &#machine
             {
                 line-height: 1.0rem;
+                word-wrap: break-word;
 
                 div:not(.value)
                 {
@@ -48,8 +49,8 @@
                     margin-top: 0.0rem;
                     margin-left: 0.0rem;
                 }
-                .array:not(:empty),
-                .object:not(:empty),
+                .array:not(.empty),
+                .object:not(.empty),
                 {
                     display: block;
                     & > div:not(.begin):not(.separator):not(.end)
@@ -65,12 +66,12 @@
                         display: inline-block;
                     }
 
-                    .list .property:last-child > .value > .separator
+                    .list .item:last-child > .value > .separator
                     {
                         display: none;
                     }
                 }
-                .property
+                .item
                 {
                     x-display: block;
                     background-color: #FFFFFF;
