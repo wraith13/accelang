@@ -289,7 +289,7 @@ function functionToHtml(obj : object): HTMLElement
             tag:"div",
             className: "function",
             //innerText: JSON.stringify(obj.toString(), null, 4)
-            innerText: "(...)"
+            innerText: "\"__FUNCTION__\""
         }
     );
 }
