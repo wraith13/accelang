@@ -36,87 +36,28 @@
 
             &#machine
             {
-                line-height: 1.0rem;
-                word-wrap: break-word;
-
-                div:not(.value)
+                div
                 {
                     display: inline-block;
                 }
-                & > div.object:not(.begin) > div.begin
-                {
-                    x-display: block;
-                    margin-top: 0.0rem;
-                    margin-left: 0.0rem;
-                }
+
                 .array:not(.empty),
-                .object:not(.empty),
+                .object:not(.empty)
                 {
-                    display: block;
-                    & > div:not(.begin):not(.separator):not(.end)
+                    & > .list
                     {
                         margin-left: 1.0rem;
                     }
-                    & > div.begin
+                    & > .list .item
                     {
-                        display: inline-block;
+                        margin-right: 1.0rem;
                     }
-                    & > div.separator
-                    {
-                        display: inline-block;
-                    }
-
-                    .list .item:last-child > .value > .separator
+                    & > .list .item:last-child > .value > .separator
                     {
                         display: none;
                     }
                 }
-                .item
-                {
-                    x-display: block;
-                    background-color: #FFFFFF;
-                    background: -prefix-linear-gradient(left top, #DEFEEE, #FFFFFF);
-                    background: linear-gradient(to bottom right, #DEFEEE, #FFFFFF);
-
-                    & > div
-                    {
-                        &.key
-                        {
-                            display: inline-block;
-                            vertical-align: top;
-                            min-width: @json-key-width;
-                            x-overflow-x: visible;
-                            white-space: nowrap;
-                        }
-                        &:not(.key):not(.array):not(.object),
-                        &:not(.key) > .begin,
-                        &.empty
-                        {
-                            display: inline-block;
-                            x-margin-top: -1.0rem;
-                            x-margin-left: @json-key-width;
-                        }
-                        &:not(.key) > .end::before
-                        {
-                            clear: both;
-                        }
-                        &:not(.key) > .end
-                        {
-                            display: inline-block;
-                            margin-left: 0.0rem;
-                        }
-                        & > div.separator
-                        {
-                            display: inline-block;
-                        }
-                    }
-                }
-                div.key
-                {
-                    background: -prefix-linear-gradient(left top, #CCEEEE, #FFFFFF);
-                    background: linear-gradient(to bottom right, #CCEEEE, #FFFFFF);
-                }
-            }
+           }
         }
     }
     &.sample-list
@@ -150,6 +91,7 @@
             &.machine
             {
                 flex-grow: 4;
+                max-width: 30vw;
             }
         }
     }
