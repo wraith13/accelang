@@ -344,6 +344,20 @@ function anyToHtml(obj : any): HTMLElement
         }
     );
 }
+function jsonToHtml(obj : object): HTMLElement
+{
+    return createElement
+    (
+        {
+            tag: "div",
+            className: "json",
+            children:
+            [
+                objectToHtml(obj)
+            ]
+        }
+    );
+}
 
 function run() : void
 {
@@ -381,6 +395,7 @@ function run() : void
     };
     try
     {
+        /*
         machine.log
         (
             JSON.stringify
@@ -394,6 +409,19 @@ function run() : void
                     .execute(),
                 null,
                 4
+            )
+        );*/
+        getOutputElement().appendChild
+        (
+            jsonToHtml
+            (
+                machine
+                .load
+                (
+                    "editor",
+                    getSourcodeElement().value
+                )
+                .execute()
             )
         );
     }
@@ -417,7 +445,7 @@ function run() : void
             )
         );
     }
-    getMachineElement().appendChild(objectToHtml(machine));
+    getMachineElement().appendChild(jsonToHtml(machine));
     console.log(JSON.stringify(machine, null, 4));
 }
 
