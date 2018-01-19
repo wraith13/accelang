@@ -129,6 +129,22 @@ function practical_typeof(obj : any) : string
 
 function arrayToHtml(array : object[]): HTMLElement
 {
+    const begin = createElement
+    (
+        {
+            tag: "div",
+            className: "begin",
+            innerText: "["
+        }
+    );
+    const end = createElement
+    (
+        {
+            tag: "div",
+            className: "end",
+            innerText: "]"
+        }
+    );
     if (0 < array.length)
     {
         const children : HTMLElement[] = [];
@@ -153,14 +169,7 @@ function arrayToHtml(array : object[]): HTMLElement
                 className:"array",
                 children:
                 [
-                    createElement
-                    (
-                        {
-                            tag: "div",
-                            className: "begin",
-                            innerText: "["
-                        }
-                    ),
+                    begin,
                     createElement
                     (
                         {
@@ -169,14 +178,8 @@ function arrayToHtml(array : object[]): HTMLElement
                             children: children
                         }
                     ),
-                    createElement
-                    (
-                        {
-                            tag: "div",
-                            className: "end",
-                            innerText: "]"
-                        }
-                    )
+                    end,
+                    makeCommaSeperator()
                 ]
             }
         );
@@ -188,7 +191,12 @@ function arrayToHtml(array : object[]): HTMLElement
             {
                 tag: "div",
                 className: "array empty",
-                innerText: "[ ]"
+                children:
+                [
+                    begin,
+                    end,
+                    makeCommaSeperator()
+                ]
             }
         );
     }
@@ -197,6 +205,22 @@ function arrayToHtml(array : object[]): HTMLElement
 function objectToHtml(obj : object): HTMLElement
 {
     const items : HTMLElement[][] = [];
+    const begin = createElement
+    (
+        {
+            tag: "div",
+            className: "begin",
+            innerText: "{"
+        }
+    );
+    const end = createElement
+    (
+        {
+            tag: "div",
+            className: "end",
+            innerText: "}"
+        }
+    );
     for(var key in obj)
     {
         if (obj.hasOwnProperty(key))
@@ -240,14 +264,7 @@ function objectToHtml(obj : object): HTMLElement
                 className:"object",
                 children:
                 [
-                    createElement
-                    (
-                        {
-                            tag: "div",
-                            className: "begin",
-                            innerText: "{"
-                        }
-                    ),
+                    begin,
                     createElement
                     (
                         {
@@ -256,14 +273,8 @@ function objectToHtml(obj : object): HTMLElement
                             children: children
                         }
                     ),
-                    createElement
-                    (
-                        {
-                            tag: "div",
-                            className: "end",
-                            innerText: "}"
-                        }
-                    )
+                    end,
+                    makeCommaSeperator()
                 ]
             }
         );
@@ -275,7 +286,12 @@ function objectToHtml(obj : object): HTMLElement
             {
                 tag: "div",
                 className: "object empty",
-                innerText: "{ }"
+                children:
+                [
+                    begin,
+                    end,
+                    makeCommaSeperator()
+                ]
             }
         );
     }
@@ -306,22 +322,36 @@ function valueToHtml(obj : object): HTMLElement
     );
 }
 
+function makeCommaSeperator(): HTMLElement
+{
+    return createElement
+    (
+        {
+            tag: "div",
+            className:"separator",
+            innerText: ","
+        }
+    );
+} 
+
 function anyToHtml(obj : any): HTMLElement
 {
-    var value : HTMLElement;
+    const children : HTMLElement[] = [];
     switch(practical_typeof(obj))
     {
         case "array":
-            value = arrayToHtml(<object[]>obj);
+            children.push(arrayToHtml(<object[]>obj));
             break;
         case "object":
-            value = objectToHtml(obj);
+            children.push(objectToHtml(obj));
             break;
         case "function":
-            value = functionToHtml(obj);
+            children.push(functionToHtml(obj));
+            children.push(makeCommaSeperator());
             break;
         default:
-            value = valueToHtml(obj);
+            children.push(valueToHtml(obj));
+            children.push(makeCommaSeperator());
             break;
     }
     return createElement
@@ -329,18 +359,7 @@ function anyToHtml(obj : any): HTMLElement
         {
             tag: "div",
             className: "value",
-            children:
-            [
-                value,
-                createElement
-                (
-                    {
-                        tag: "div",
-                        className:"separator",
-                        innerText: ","
-                    }
-                )
-            ]
+            children: children
         }
     );
 }
@@ -353,7 +372,7 @@ function jsonToHtml(obj : object): HTMLElement
             className: "json",
             children:
             [
-                objectToHtml(obj)
+                anyToHtml(obj)
             ]
         }
     );

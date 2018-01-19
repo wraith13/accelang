@@ -52,12 +52,20 @@
                     {
                         margin-right: 1.0rem;
                     }
-                    & > .list .item:last-child > .value > .separator
+                    & > .list .item:last-child > .value > .separator,
+                    & > .list .item:last-child > .value > .array > .separator,
+                    & > .list .item:last-child > .value > .object > .separator
                     {
                         display: none;
                     }
                 }
-           }
+                & > .value > .separator,
+                & > .value > .array > .separator,
+                & > .value > .object > .separator
+                {
+                    display: none;
+                }
+            }
         }
     }
     &.sample-list
