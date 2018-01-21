@@ -162,7 +162,7 @@ function arrayToHtml(array : object[]): HTMLElement
                 )
             );
         }
-        return createElement
+        const element = createElement
         (
             {
                 tag:"div",
@@ -183,6 +183,16 @@ function arrayToHtml(array : object[]): HTMLElement
                 ]
             }
         );
+        element.addEventListener
+        (
+            "click",
+            event =>
+            {
+                event.stopPropagation();
+                element.classList.toggle("toggle");
+            }
+        );
+        return element;
     }
     else
     {
@@ -257,7 +267,7 @@ function objectToHtml(obj : object): HTMLElement
                 )
             );
         }
-        return createElement
+        const element = createElement
         (
             {
                 tag:"div",
@@ -278,6 +288,16 @@ function objectToHtml(obj : object): HTMLElement
                 ]
             }
         );
+        element.addEventListener
+        (
+            "click",
+            event =>
+            {
+                event.stopPropagation();
+                element.classList.toggle("toggle");
+            }
+        );
+        return element;
     }
     else
     {
