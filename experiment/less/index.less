@@ -1,6 +1,31 @@
 @import "params.less";
 @import "template.less";
 
+@common-transition:
+{
+    -moz-transition-duration: 0.3s;
+    -moz-transition-property: all;
+    -webkit-transition-duration: 0.3s;
+    -webkit-transition-property: all;
+    transition-duration: 0.3s;
+    transition-property: all;
+    transition-timing-function: ease;
+};
+@common-fadeout:
+{
+    font-size: 0rem;
+    width: 0px;
+    height: 0px;
+    opacity: 0;
+};
+@common-fadein:
+{
+    font-size: 1rem;
+    width: auto;
+    height: auto;
+    opacity: 1;
+};
+
 #body > .container > .pane
 {
     width: 100vw;
@@ -45,20 +70,43 @@
                 {
                     &.toggle
                     {
-                        & > .list
+                        & > .list,
                         {
-                            display: none;
+                            @common-transition();
+                            @common-fadeout();
+                            margin-left: 0.0rem;
+                        }
+                        & > .list *,
+                        {
+                            @common-transition();
+                            @common-fadeout();
                         }
                         & > .begin:after
                         {
+                            @common-transition();
+                            @common-fadein();
                             margin-left: 1.0rem;
                             margin-right: 1.0rem;
-                            content: "...";
                         }
                     }
                     & > .list
                     {
+                        @common-transition();
+                        @common-fadein();
                         margin-left: 1.0rem;
+                        *
+                        {
+                            @common-transition();
+                            @common-fadein();
+                        }
+                        & > .begin:after
+                        {
+                            @common-transition();
+                            @common-fadeout();
+                            margin-left: 0rem;
+                            margin-right: 0rem;
+                            content: "...";
+                        }
                     }
                     & > .list .item
                     {
