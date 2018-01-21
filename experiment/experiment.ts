@@ -109,7 +109,7 @@ function select(url : string) : void
     );
 }
 
-function practical_typeof(obj : any) : string
+function practicalTypeof(obj : any) : string
 {
     if (undefined === obj)
     {
@@ -316,7 +316,7 @@ function valueToHtml(obj : object): HTMLElement
     (
         {
             tag: "div",
-            className: practical_typeof(obj),
+            className: practicalTypeof(obj),
             innerText:JSON.stringify(obj, null, 4)
         }
     );
@@ -337,7 +337,7 @@ function makeCommaSeperator(): HTMLElement
 function anyToHtml(obj : any): HTMLElement
 {
     const children : HTMLElement[] = [];
-    switch(practical_typeof(obj))
+    switch(practicalTypeof(obj))
     {
         case "array":
             children.push(arrayToHtml(<object[]>obj));
