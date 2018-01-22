@@ -26,6 +26,22 @@ function getMachineElement() : HTMLElement
 {
     return <HTMLElement>document.getElementById("machine");
 }
+var currentHoverElement :HTMLElement = null;
+function updateHoverElement(element : HTMLElement) : void
+{
+    if (element !== currentHoverElement)
+    {
+        if (currentHoverElement)
+        {
+            currentHoverElement.classList.remove("hover");
+        }
+        currentHoverElement = element;
+        if (currentHoverElement)
+        {
+            currentHoverElement.classList.add("hover");
+        }
+    }
+}
 
 class CreateElementArg
 {
@@ -185,6 +201,15 @@ function arrayToHtml(array : object[]): HTMLElement
         );
         element.addEventListener
         (
+            "mouseover",
+            event =>
+            {
+                event.stopPropagation();
+                updateHoverElement(element);
+            }
+        );
+        element.addEventListener
+        (
             "click",
             event =>
             {
@@ -286,6 +311,15 @@ function objectToHtml(obj : object): HTMLElement
                     end,
                     makeCommaSeperator()
                 ]
+            }
+        );
+        element.addEventListener
+        (
+            "mouseover",
+            event =>
+            {
+                event.stopPropagation();
+                updateHoverElement(element);
             }
         );
         element.addEventListener
