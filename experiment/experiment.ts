@@ -468,22 +468,6 @@ function run() : void
     };
     try
     {
-        /*
-        machine.log
-        (
-            JSON.stringify
-            (
-                machine
-                    .load
-                    (
-                        "editor",
-                        getSourcodeElement().value
-                    )
-                    .execute(),
-                null,
-                4
-            )
-        );*/
         getOutputElement().appendChild
         (
             jsonToHtml
