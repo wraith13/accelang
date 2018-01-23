@@ -43,6 +43,18 @@ function updateHoverElement(element : HTMLElement) : void
     }
 }
 
+function leaveHoverElement(element : HTMLElement) : void
+{
+    if (element === currentHoverElement)
+    {
+        if (currentHoverElement)
+        {
+            currentHoverElement.classList.remove("hover");
+        }
+        currentHoverElement = null;
+    }
+}
+
 class CreateElementArg
 {
     tag : string;
@@ -210,6 +222,15 @@ function arrayToHtml(array : object[]): HTMLElement
         );
         element.addEventListener
         (
+            "mouseout",
+            event =>
+            {
+                event.stopPropagation();
+                leaveHoverElement(element);
+            }
+        );
+        element.addEventListener
+        (
             "click",
             event =>
             {
@@ -320,6 +341,15 @@ function objectToHtml(obj : object): HTMLElement
             {
                 event.stopPropagation();
                 updateHoverElement(element);
+            }
+        );
+        element.addEventListener
+        (
+            "mouseout",
+            event =>
+            {
+                event.stopPropagation();
+                leaveHoverElement(element);
             }
         );
         element.addEventListener
