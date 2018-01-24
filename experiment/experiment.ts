@@ -155,6 +155,38 @@ function practicalTypeof(obj : any) : string
     return typeof obj;
 }
 
+function addEventListenerForBracket(parent : HTMLElement, bracket : HTMLElement): HTMLElement
+{
+    bracket.addEventListener
+    (
+        "mouseover",
+        event =>
+        {
+            event.stopPropagation();
+            updateHoverElement(parent);
+        }
+    );
+    bracket.addEventListener
+    (
+        "mouseout",
+        event =>
+        {
+            event.stopPropagation();
+            leaveHoverElement(parent);
+        }
+    );
+    bracket.addEventListener
+    (
+        "click",
+        event =>
+        {
+            event.stopPropagation();
+            parent.classList.toggle("toggle");
+        }
+    );
+    return bracket;
+}
+
 function arrayToHtml(array : object[]): HTMLElement
 {
     const begin = createElement
@@ -211,60 +243,8 @@ function arrayToHtml(array : object[]): HTMLElement
                 ]
             }
         );
-        begin.addEventListener
-        (
-            "mouseover",
-            event =>
-            {
-                event.stopPropagation();
-                updateHoverElement(element);
-            }
-        );
-        begin.addEventListener
-        (
-            "mouseout",
-            event =>
-            {
-                event.stopPropagation();
-                leaveHoverElement(element);
-            }
-        );
-        begin.addEventListener
-        (
-            "click",
-            event =>
-            {
-                event.stopPropagation();
-                element.classList.toggle("toggle");
-            }
-        );
-        end.addEventListener
-        (
-            "mouseover",
-            event =>
-            {
-                event.stopPropagation();
-                updateHoverElement(element);
-            }
-        );
-        end.addEventListener
-        (
-            "mouseout",
-            event =>
-            {
-                event.stopPropagation();
-                leaveHoverElement(element);
-            }
-        );
-        end.addEventListener
-        (
-            "click",
-            event =>
-            {
-                event.stopPropagation();
-                element.classList.toggle("toggle");
-            }
-        );
+        addEventListenerForBracket(element, begin);
+        addEventListenerForBracket(element, end);
         return element;
     }
     else
@@ -361,60 +341,8 @@ function objectToHtml(obj : object): HTMLElement
                 ]
             }
         );
-        begin.addEventListener
-        (
-            "mouseover",
-            event =>
-            {
-                event.stopPropagation();
-                updateHoverElement(element);
-            }
-        );
-        begin.addEventListener
-        (
-            "mouseout",
-            event =>
-            {
-                event.stopPropagation();
-                leaveHoverElement(element);
-            }
-        );
-        begin.addEventListener
-        (
-            "click",
-            event =>
-            {
-                event.stopPropagation();
-                element.classList.toggle("toggle");
-            }
-        );
-        end.addEventListener
-        (
-            "mouseover",
-            event =>
-            {
-                event.stopPropagation();
-                updateHoverElement(element);
-            }
-        );
-        end.addEventListener
-        (
-            "mouseout",
-            event =>
-            {
-                event.stopPropagation();
-                leaveHoverElement(element);
-            }
-        );
-        end.addEventListener
-        (
-            "click",
-            event =>
-            {
-                event.stopPropagation();
-                element.classList.toggle("toggle");
-            }
-        );
+        addEventListenerForBracket(element, begin);
+        addEventListenerForBracket(element, end);
         return element;
     }
     else
