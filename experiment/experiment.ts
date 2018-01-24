@@ -45,7 +45,7 @@ function updateHoverElement(element : HTMLElement) : void
 
 function leaveHoverElement(element : HTMLElement) : void
 {
-    if (element === currentHoverElement)
+    if (null === element || element === currentHoverElement)
     {
         if (currentHoverElement)
         {
@@ -211,7 +211,7 @@ function arrayToHtml(array : object[]): HTMLElement
                 ]
             }
         );
-        element.addEventListener
+        begin.addEventListener
         (
             "mouseover",
             event =>
@@ -220,7 +220,7 @@ function arrayToHtml(array : object[]): HTMLElement
                 updateHoverElement(element);
             }
         );
-        element.addEventListener
+        begin.addEventListener
         (
             "mouseout",
             event =>
@@ -229,7 +229,34 @@ function arrayToHtml(array : object[]): HTMLElement
                 leaveHoverElement(element);
             }
         );
-        element.addEventListener
+        begin.addEventListener
+        (
+            "click",
+            event =>
+            {
+                event.stopPropagation();
+                element.classList.toggle("toggle");
+            }
+        );
+        end.addEventListener
+        (
+            "mouseover",
+            event =>
+            {
+                event.stopPropagation();
+                updateHoverElement(element);
+            }
+        );
+        end.addEventListener
+        (
+            "mouseout",
+            event =>
+            {
+                event.stopPropagation();
+                leaveHoverElement(element);
+            }
+        );
+        end.addEventListener
         (
             "click",
             event =>
@@ -334,7 +361,7 @@ function objectToHtml(obj : object): HTMLElement
                 ]
             }
         );
-        element.addEventListener
+        begin.addEventListener
         (
             "mouseover",
             event =>
@@ -343,7 +370,7 @@ function objectToHtml(obj : object): HTMLElement
                 updateHoverElement(element);
             }
         );
-        element.addEventListener
+        begin.addEventListener
         (
             "mouseout",
             event =>
@@ -352,7 +379,34 @@ function objectToHtml(obj : object): HTMLElement
                 leaveHoverElement(element);
             }
         );
-        element.addEventListener
+        begin.addEventListener
+        (
+            "click",
+            event =>
+            {
+                event.stopPropagation();
+                element.classList.toggle("toggle");
+            }
+        );
+        end.addEventListener
+        (
+            "mouseover",
+            event =>
+            {
+                event.stopPropagation();
+                updateHoverElement(element);
+            }
+        );
+        end.addEventListener
+        (
+            "mouseout",
+            event =>
+            {
+                event.stopPropagation();
+                leaveHoverElement(element);
+            }
+        );
+        end.addEventListener
         (
             "click",
             event =>
