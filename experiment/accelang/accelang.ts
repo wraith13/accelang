@@ -731,7 +731,12 @@ module accelang
             const type = code["&A"];
             if (undefined === type || null === type)
             {
-                result = this.makeError("format error(missing type)", code);
+                result = this.makeError
+                (
+                    "format error(missing type)",
+                    code,
+                    codepath
+                );
             }
             else
             {
