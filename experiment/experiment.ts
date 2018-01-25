@@ -81,6 +81,25 @@ function createElement(arg : CreateElementArg) : HTMLElement
     }
     return element;
 }
+function createDiv(className : string, innerText : string) : HTMLElement;
+function createDiv(className : string, children : HTMLElement[]) : HTMLElement;
+function createDiv(className : string, x : any) : HTMLElement
+{
+    return createElement
+    (
+        "string" === practicalTypeof(x) ?
+        {
+            tag: "div",
+            className: className,
+            innerText: x
+        }:
+        {
+            tag: "div",
+            className: className,
+            children: x
+        }
+    );
+}
 
 setTimeout
 (
@@ -189,59 +208,24 @@ function addEventListenerForBracket(parent : HTMLElement, bracket : HTMLElement)
 
 function arrayToHtml(array : object[]): HTMLElement
 {
-    const begin = createElement
-    (
-        {
-            tag: "div",
-            className: "begin",
-            innerText: "["
-        }
-    );
-    const end = createElement
-    (
-        {
-            tag: "div",
-            className: "end",
-            innerText: "]"
-        }
-    );
+    const begin = createDiv("begin", "[");
+    const end = createDiv("end", "]");
     if (0 < array.length)
     {
         const children : HTMLElement[] = [];
         for(var i = 0; i < array.length; ++i) {
             const item : HTMLElement[] = [anyToHtml(array[i])];
-            children.push
-            (
-                createElement
-                (
-                    {
-                        tag: "div",
-                        className: "item",
-                        children: item
-                    }
-                )
-            );
+            children.push(createDiv("item",　item));
         }
-        const element = createElement
+        const element = createDiv
         (
-            {
-                tag:"div",
-                className:"array",
-                children:
-                [
-                    begin,
-                    createElement
-                    (
-                        {
-                            tag: "div",
-                            className: "list",
-                            children: children
-                        }
-                    ),
-                    end,
-                    makeCommaSeperator()
-                ]
-            }
+            "array",
+            [
+                begin,
+                createDiv("list",　children),
+                end,
+                makeCommaSeperator()
+            ]
         );
         addEventListenerForBracket(element, begin);
         addEventListenerForBracket(element, end);
@@ -249,18 +233,14 @@ function arrayToHtml(array : object[]): HTMLElement
     }
     else
     {
-        return createElement
+        return createDiv
         (
-            {
-                tag: "div",
-                className: "array empty",
-                children:
-                [
-                    begin,
-                    end,
-                    makeCommaSeperator()
-                ]
-            }
+            "array empty",
+            [
+                begin,
+                end,
+                makeCommaSeperator()
+            ]
         );
     }
 }
@@ -268,22 +248,8 @@ function arrayToHtml(array : object[]): HTMLElement
 function objectToHtml(obj : object): HTMLElement
 {
     const items : HTMLElement[][] = [];
-    const begin = createElement
-    (
-        {
-            tag: "div",
-            className: "begin",
-            innerText: "{"
-        }
-    );
-    const end = createElement
-    (
-        {
-            tag: "div",
-            className: "end",
-            innerText: "}"
-        }
-    );
+    const begin = createDiv("begin",　"{");
+    const end = createDiv("end",　"}");
     for(var key in obj)
     {
         if (obj.hasOwnProperty(key))
@@ -291,14 +257,7 @@ function objectToHtml(obj : object): HTMLElement
             items.push
             (
                 [
-                    createElement
-                    (
-                        {
-                            tag:"div",
-                            className:"key",
-                            innerText: JSON.stringify(key) +":"
-                        }
-                    ),
+                    createDiv("key", JSON.stringify(key) +":"),
                     anyToHtml(obj[key])
                 ]
             );
@@ -306,40 +265,15 @@ function objectToHtml(obj : object): HTMLElement
     }
     if (0 < items.length)
     {
-        const children : HTMLElement[] = [];
-        for(var i = 0; i < items.length; ++i) {
-            children.push
-            (
-                createElement
-                (
-                    {
-                        tag: "div",
-                        className: "item",
-                        children: items[i]
-                    }
-                )
-            );
-        }
-        const element = createElement
+        const element = createDiv
         (
-            {
-                tag:"div",
-                className:"object",
-                children:
-                [
-                    begin,
-                    createElement
-                    (
-                        {
-                            tag: "div",
-                            className: "list",
-                            children: children
-                        }
-                    ),
-                    end,
-                    makeCommaSeperator()
-                ]
-            }
+            "object",
+            [
+                begin,
+                createDiv("list", items.map(i => createDiv("item", i))),
+                end,
+                makeCommaSeperator()
+            ]
         );
         addEventListenerForBracket(element, begin);
         addEventListenerForBracket(element, end);
@@ -347,57 +281,40 @@ function objectToHtml(obj : object): HTMLElement
     }
     else
     {
-        return createElement
+        return createDiv
         (
-            {
-                tag: "div",
-                className: "object empty",
-                children:
-                [
-                    begin,
-                    end,
-                    makeCommaSeperator()
-                ]
-            }
+            "object empty",
+            [
+                begin,
+                end,
+                makeCommaSeperator()
+            ]
         );
     }
 }
 
-function functionToHtml(obj : object): HTMLElement
+function functionToHtml(_obj : object): HTMLElement
 {
-    return createElement
+    return createDiv
     (
-        {
-            tag:"div",
-            className: "function",
-            //innerText: JSON.stringify(obj.toString(), null, 4)
-            innerText: "\"__FUNCTION__\""
-        }
+        "function",
+        //JSON.stringify(obj.toString(), null, 4)
+        "\"__FUNCTION__\""
     );
 }
 
 function valueToHtml(obj : object): HTMLElement
 {
-    return createElement
+    return createDiv
     (
-        {
-            tag: "div",
-            className: practicalTypeof(obj),
-            innerText:JSON.stringify(obj, null, 4)
-        }
+        practicalTypeof(obj),
+        JSON.stringify(obj, null, 4)
     );
 }
 
 function makeCommaSeperator(): HTMLElement
 {
-    return createElement
-    (
-        {
-            tag: "div",
-            className:"separator",
-            innerText: ","
-        }
-    );
+    return createDiv("separator", ",");
 } 
 
 function anyToHtml(obj : any): HTMLElement
@@ -420,28 +337,11 @@ function anyToHtml(obj : any): HTMLElement
             children.push(makeCommaSeperator());
             break;
     }
-    return createElement
-    (
-        {
-            tag: "div",
-            className: "value",
-            children: children
-        }
-    );
+    return createDiv("value", children);
 }
 function jsonToHtml(obj : object): HTMLElement
 {
-    return createElement
-    (
-        {
-            tag: "div",
-            className: "json",
-            children:
-            [
-                anyToHtml(obj)
-            ]
-        }
-    );
+    return createDiv("json", [anyToHtml(obj)]);
 }
 
 function run() : void
@@ -452,31 +352,11 @@ function run() : void
     
     machine.log = (text : string) : void =>
     {
-        getOutputElement().appendChild
-        (
-            createElement
-            (
-                {
-                    tag:"div",
-                    className:"log",
-                    innerText:text
-                }
-            )
-        );
+        getOutputElement().appendChild(createDiv("log", text));
     };
     machine.error = (text : string) : void =>
     {
-        getOutputElement().appendChild
-        (
-            createElement
-            (
-                {
-                    tag:"div",
-                    className:"error",
-                    innerText:text
-                }
-            )
-        );
+        getOutputElement().appendChild(createDiv("error", text));
     };
     try
     {
@@ -503,7 +383,8 @@ function run() : void
                 error["&A"] ?
                     error:
                     {
-                        "JavaScript.Error": {
+                        "JavaScript.Error":
+                        {
                             "name": error.name,
                             "message": error.message,
                             "stack": error.stack.split("\n")
