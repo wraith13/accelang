@@ -720,6 +720,66 @@ module accelang
 //        
 //    }
 
+        typeValidation(codepath : string[], code : object) : object
+        {
+            let result = { };
+            const type = code["&A"];
+            if (undefined === type || null === type)
+            {
+                result = this.makeError
+                (
+                    "format error(missing type)",
+                    code,
+                    codepath
+                );
+            }
+            else
+            {
+                switch(typeof(type))
+                {
+                case "string":
+                    switch(type)
+                    {
+    //                case "call":
+    //                    return call(code, context);
+    
+                    case "error":
+                        result = code;
+                        break;
+    
+                    case "file":
+                        result = code["code"];
+                        //objectAssign(this.codeCursorMap, code["codeLocationMap"]);
+                        break;
+    
+                    default:
+                        result = this.makeError
+                        (
+                            `uknown type error: ${type}`,
+                            code,
+                            codepath.concat("&A")
+                        );
+                    }
+                    break;
+                    
+                case "object":
+                    {
+                        //const complex_type = accelang.evaluate(type);
+                        break;
+                    }
+    
+                default:
+                    result = this.makeError
+                    (
+                        `format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`,
+                        code,
+                        codepath.concat("&A")
+                    );
+                }
+            }
+            return result;
+        }
+
         loadCore(codepath : string[], code : object) : object
         {
             //  この関数の役割は全てのコードおよびデータをコードからアクセス可能な状態にすること。
