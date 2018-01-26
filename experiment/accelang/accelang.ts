@@ -14,7 +14,7 @@ module accelang
         }
     }
 
-    export function httpGet(url : string, callback : (response_body : string)=>void) :void
+    export function httpGet(url : string, callback : (url : string, response_body : string)=>void) :void
     {
         const request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
     
@@ -23,7 +23,7 @@ module accelang
         {
             if (4 === request.readyState && 200 === request.status)
             {
-                callback(request.responseText);
+                callback(url, request.responseText);
             }
         };
         request.send(null);
@@ -635,7 +635,7 @@ module accelang
             httpGet
             (
                 this.url,
-                (response_body) => callback(response_body)
+                (_url, response_body) => callback(response_body)
             );
         }
     }
