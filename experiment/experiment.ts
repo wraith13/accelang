@@ -108,7 +108,7 @@ setTimeout
         accelang.httpGet
         (
             "samples/index.json",
-            (_url, samples) => document
+            samples => document
                 .getElementsByClassName("sample-list")[0]
                 .getElementsByClassName("container")[0]
                 .getElementsByTagName("ul")[0].innerHTML = 
@@ -152,7 +152,7 @@ function select(url : string) : void
     accelang.httpGet
     (
         url,
-        (_url, sample) => getSourcodeElement().value = sample
+        sample => getSourcodeElement().value = sample
     );
 }
 

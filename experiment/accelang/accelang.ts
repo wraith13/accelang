@@ -14,7 +14,7 @@ module accelang
         }
     }
 
-    export function httpGet(url : string, callback : (url : string, response_body : string)=>void) :void
+    export function httpGet(url : string, callback : (response_body : string)=>void) :void
     {
         const request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
     
@@ -23,7 +23,7 @@ module accelang
         {
             if (4 === request.readyState && 200 === request.status)
             {
-                callback(url, request.responseText);
+                callback(request.responseText);
             }
         };
         request.send(null);
@@ -635,7 +635,7 @@ module accelang
             httpGet
             (
                 this.url,
-                (_url, response_body) => callback(response_body)
+                response_body => callback(response_body)
             );
         }
     }
@@ -688,10 +688,12 @@ module accelang
         constructor(version : AmpVersion | null = null)
         {
             this.version = version;
+            
+            const filepath = "./syntax.json";
             httpGet
             (
-                "./syntax.json",
-                (filepath, response_body) =>
+                filepath,
+                response_body =>
                 {
                     this.embedded = parseFile(filepath, response_body);
                     if (this.onEmbeddedLoaded)
