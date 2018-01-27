@@ -678,6 +678,9 @@ module accelang
         footstamp : object[] = [];
         coverage : object[] = [];
         codeCursorMap : { [name: string] : AmpCodeCursor } = {};
+        embedded : object;
+
+        onEmbeddedLoaded : () => void = null;
 
         log : (text : string) => void = (text : string) => console.log(text);
         error : (text : string) => void = (text : string) => console.error(text);
@@ -685,6 +688,18 @@ module accelang
         constructor(version : AmpVersion | null = null)
         {
             this.version = version;
+            httpGet
+            (
+                "./syntax.json",
+                (filepath, response_body) =>
+                {
+                    this.embedded = parseFile(filepath, response_body);
+                    if (this.onEmbeddedLoaded)
+                    {
+                        this.onEmbeddedLoaded();
+                    }
+                }
+            );
         }
 
         makeError(message : string, code : object = null, codepath : string[] = null) : object
