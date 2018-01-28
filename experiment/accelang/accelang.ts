@@ -14,19 +14,25 @@ module accelang
         }
     }
 
-    export function httpGet(url : string, callback : (response_body : string)=>void) :void
+    export async function httpGet(url : string) :Promise<string>
     {
-        const request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
-    
-        request.open('GET', url, true);
-        request.onreadystatechange = () =>
-        {
-            if (4 === request.readyState && 200 === request.status)
+        return new Promise<string>
+        (
+            async (resolve) =>
             {
-                callback(request.responseText);
-            }
-        };
-        request.send(null);
+                const request = (<any>window).XMLHttpRequest ? new XMLHttpRequest(): new ActiveXObject("Microsoft.XMLHTTP");
+    
+                request.open('GET', url, true);
+                request.onreadystatechange = () =>
+                {
+                    if (4 === request.readyState && 200 === request.status)
+                    {
+                        resolve(request.responseText);
+                    }
+                };
+                request.send(null);
+                    }
+        );
     }
 
     export function stacktrace() : string
@@ -630,13 +636,9 @@ module accelang
         version : AmpVersion;
         url : string;
 
-        get(callback : (code : string)=>void) :void
+        async get() :Promise<string>
         {
-            httpGet
-            (
-                this.url,
-                response_body => callback(response_body)
-            );
+            return await httpGet(this.url);
         }
     }
 
@@ -690,18 +692,13 @@ module accelang
             this.version = version;
             
             const filepath = "./syntax.json";
-            httpGet
-            (
-                filepath,
-                response_body =>
+            setTimeout(async () => {
+                this.embedded = parseFile(filepath, await httpGet(filepath));
+                if (this.onEmbeddedLoaded)
                 {
-                    this.embedded = parseFile(filepath, response_body);
-                    if (this.onEmbeddedLoaded)
-                    {
-                        this.onEmbeddedLoaded();
-                    }
+                    this.onEmbeddedLoaded();
                 }
-            );
+            }, 0);
         }
 
         makeError(message : string, code : object = null, codepath : string[] = null) : object
@@ -717,16 +714,9 @@ module accelang
             };
         }
 
-        get(pack : AmpPackage) : void
+        async get(pack : AmpPackage) : Promise<void>
         {
-            pack.get
-            (
-                code => this.load
-                (
-                    pack.url,
-                    code
-                )
-            );
+            this.load(pack.url, await pack.get());
         }
 
 //    call(code : object) : object

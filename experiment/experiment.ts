@@ -103,19 +103,15 @@ function createDiv(className : string, x : any) : HTMLElement
 
 setTimeout
 (
-    () =>
+    async () =>
     {
-        accelang.httpGet
-        (
-            "samples/index.json",
-            samples => document
-                .getElementsByClassName("sample-list")[0]
-                .getElementsByClassName("container")[0]
-                .getElementsByTagName("ul")[0].innerHTML = 
-                    JSON.parse(samples)
-                    .map(i => `<li onclick=select('${i.url}')>${i.name}</li>`)
-                    .join("")
-        );
+        document
+        .getElementsByClassName("sample-list")[0]
+        .getElementsByClassName("container")[0]
+        .getElementsByTagName("ul")[0].innerHTML = 
+            JSON.parse(await accelang.httpGet("samples/index.json"))
+            .map(i => `<li onclick=select('${i.url}')>${i.name}</li>`)
+            .join("");
         fillHeight();
         window.onresize = fillHeight;
         getRunElement().onclick = run;
@@ -147,13 +143,9 @@ function fillHeight() : void
     }
 }
 
-function select(url : string) : void
+async function select(url : string) : Promise<void>
 {
-    accelang.httpGet
-    (
-        url,
-        sample => getSourcodeElement().value = sample
-    );
+    getSourcodeElement().value = await accelang.httpGet(url);
 }
 
 function practicalTypeof(obj : any) : string
