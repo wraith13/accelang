@@ -682,7 +682,7 @@ module accelang
         codeCursorMap : { [name: string] : AmpCodeCursor } = {};
         embedded : object;
 
-        onEmbeddedLoaded : () => void = null;
+        onEmbeddedLoaded : (() => void)[] = [];
 
         log : (text : string) => void = (text : string) => console.log(text);
         error : (text : string) => void = (text : string) => console.error(text);
@@ -694,10 +694,7 @@ module accelang
             const filepath = "./syntax.json";
             setTimeout(async () => {
                 this.embedded = parseFile(filepath, await httpGet(filepath));
-                if (this.onEmbeddedLoaded)
-                {
-                    this.onEmbeddedLoaded();
-                }
+                this.onEmbeddedLoaded.forEach(f => f());
             }, 0);
         }
 
