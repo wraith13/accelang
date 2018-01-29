@@ -14,6 +14,24 @@ module accelang
         }
     }
 
+    export function practicalTypeof(obj : any) : string
+    {
+        if (undefined === obj)
+        {
+            return "undefined";
+        }
+        if (null === obj)
+        {
+            return "null";
+        }
+        if ("[object Array]" === Object.prototype.toString.call(obj))
+        {
+            return "array";
+        }
+
+        return typeof obj;
+    }
+
     export async function httpGet(url : string) :Promise<string>
     {
         return new Promise<string>
@@ -31,7 +49,7 @@ module accelang
                     }
                 };
                 request.send(null);
-                    }
+            }
         );
     }
 
@@ -168,7 +186,7 @@ module accelang
             )
             {
                 this.cursor = cursor;
-                this.code =code;
+                this.code = code;
             }
 
             getChar() : string
@@ -680,7 +698,7 @@ module accelang
         footstamp : object[] = [];
         coverage : object[] = [];
         codeCursorMap : { [name: string] : AmpCodeCursor } = {};
-        embedded : object;
+        embedded : object = null;
 
         onEmbeddedLoaded : (() => void)[] = [];
 
@@ -691,11 +709,28 @@ module accelang
         {
             this.version = version;
             
-            const filepath = "./syntax.json";
+            const filepath = "./accelang/syntax.json";
             setTimeout(async () => {
                 this.embedded = parseFile(filepath, await httpGet(filepath));
                 this.onEmbeddedLoaded.forEach(f => f());
             }, 0);
+        }
+        async waitEmbeddedLoaded() : Promise<void>
+        {
+            return new Promise<void>
+            (
+                (resolve) =>
+                {
+                    if (this.embedded)
+                    {
+                        resolve();
+                    }
+                    else
+                    {
+                        this.onEmbeddedLoaded.push(resolve);
+                    }
+                }
+            );
         }
 
         makeError(message : string, code : object = null, codepath : string[] = null) : object
@@ -724,8 +759,9 @@ module accelang
 //        
 //    }
 
-        typeValidation(codepath : string[], code : object) : object
+        async typeValidation(codepath : string[], code : object) : Promise<object>
         {
+            await this.waitEmbeddedLoaded();
             let result = { };
             const type = code["&A"];
             if (undefined === type || null === type)
@@ -739,7 +775,7 @@ module accelang
             }
             else
             {
-                switch(typeof(type))
+                switch(practicalTypeof(type))
                 {
                 case "string":
                     switch(type)
@@ -775,7 +811,7 @@ module accelang
                 default:
                     result = this.makeError
                     (
-                        `format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`,
+                        `format error(invalid type): ${practicalTypeof(type)}, ${JSON.stringify(type)}`,
                         code,
                         codepath.concat("&A")
                     );
@@ -784,8 +820,9 @@ module accelang
             return result;
         }
 
-        loadCore(codepath : string[], code : object) : object
+        async loadCore(codepath : string[], code : object) : Promise<object>
         {
+            await this.waitEmbeddedLoaded();
             //  この関数の役割は全てのコードおよびデータをコードからアクセス可能な状態にすること。
             //  シンタックスエラーの類いの検出はこの関数内で行ってしまう。
             //  エラーを検出しても可能な限り最後まで処理を行う。
@@ -804,7 +841,7 @@ module accelang
             }
             else
             {
-                switch(typeof(type))
+                switch(practicalTypeof(type))
                 {
                 case "string":
                     switch(type)
@@ -840,7 +877,7 @@ module accelang
                 default:
                     result = this.makeError
                     (
-                        `format error(invalid type): ${typeof(type)}, ${JSON.stringify(type)}`,
+                        `format error(invalid type): ${practicalTypeof(type)}, ${JSON.stringify(type)}`,
                         code,
                         codepath.concat("&A")
                     );
@@ -849,45 +886,50 @@ module accelang
             return result;
         }
     
-        preload(filepath : string, code : string) : object
+        async preload(filepath : string, code : string) : Promise<object>
         {
+            await this.waitEmbeddedLoaded();
             //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
-            return this.loadCore
+            return await this.loadCore
             (
                 [""],
                 parseFile(filepath, code)
             );
         }
-        preprocess(code : object, _context : AmpMachine = null) : object
+        async preprocess(code : object, _context : AmpMachine = null) : Promise<object>
         {
+            await this.waitEmbeddedLoaded();
             return code;
         }
     
-        load(filepath : string, code : string) : AmpMachine
+        async load(filepath : string, code : string) : Promise<AmpMachine>
         {
+            await this.waitEmbeddedLoaded();
             this.code.push
             (
-                this.loadCore
+                await this.loadCore
                 (
                     [""],
-                    this.preprocess
+                    await this.preprocess
                     (
-                        this.preload(filepath, code),
+                        await this.preload(filepath, code),
                         this
                     )
                 )
             );
             return this;
         }
-        execute() : object
+        async execute() : Promise<object>
         {
-            return this.evaluate(this.code);
+            return await this.evaluate(this.code);
         }
-        evaluate(code : object) : object
+        async evaluate(code : object) : Promise<object>
         {
-            if (Array.isArray(code))
+            await this.waitEmbeddedLoaded();
+
+            if ("array" === practicalTypeof(code))
             {
-                return code.map(i => this.evaluate(i));
+                return await Promise.all((<Array<object>>code).map(async i => await this.evaluate(i)));
             }
     
             const type = code["&A"];

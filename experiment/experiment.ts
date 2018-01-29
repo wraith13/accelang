@@ -87,7 +87,7 @@ function createDiv(className : string, x : any) : HTMLElement
 {
     return createElement
     (
-        "string" === practicalTypeof(x) ?
+        "string" === accelang.practicalTypeof(x) ?
         {
             tag: "div",
             className: className,
@@ -109,7 +109,7 @@ setTimeout
         .getElementsByClassName("sample-list")[0]
         .getElementsByClassName("container")[0]
         .getElementsByTagName("ul")[0].innerHTML = 
-            JSON.parse(await accelang.httpGet("samples/index.json"))
+            JSON.parse(await accelang.httpGet("./samples/index.json"))
             .map(i => `<li onclick=select('${i.url}')>${i.name}</li>`)
             .join("");
         fillHeight();
@@ -148,23 +148,6 @@ async function select(url : string) : Promise<void>
     getSourcodeElement().value = await accelang.httpGet(url);
 }
 
-function practicalTypeof(obj : any) : string
-{
-    if (undefined === obj)
-    {
-        return "undefined";
-    }
-    if (null === obj)
-    {
-        return "null";
-    }
-    if ("[object Array]" === Object.prototype.toString.call(obj))
-    {
-        return "array";
-    }
-
-    return typeof obj;
-}
 
 function addEventListenerForBracket(parent : HTMLElement, bracket : HTMLElement): HTMLElement
 {
@@ -299,7 +282,7 @@ function valueToHtml(obj : object): HTMLElement
 {
     return createDiv
     (
-        practicalTypeof(obj),
+        accelang.practicalTypeof(obj),
         JSON.stringify(obj, null, 4)
     );
 }
@@ -312,7 +295,7 @@ function makeCommaSeperator(): HTMLElement
 function anyToHtml(obj : any): HTMLElement
 {
     const children : HTMLElement[] = [];
-    switch(practicalTypeof(obj))
+    switch(accelang.practicalTypeof(obj))
     {
         case "array":
             children.push(arrayToHtml(<object[]>obj));
@@ -336,7 +319,7 @@ function jsonToHtml(obj : object): HTMLElement
     return createDiv("json", [anyToHtml(obj)]);
 }
 
-function run() : void
+async function run() : Promise<void>
 {
     getOutputElement().innerHTML = "";
     getMachineElement().innerHTML = "";
@@ -356,13 +339,14 @@ function run() : void
         (
             jsonToHtml
             (
-                machine
-                .load
+                await
                 (
-                    "editor",
-                    getSourcodeElement().value
-                )
-                .execute()
+                    await machine.load
+                    (
+                        "editor",
+                        getSourcodeElement().value
+                    )
+                ).execute()
             )
         );
     }
@@ -388,7 +372,7 @@ function run() : void
         );
     }
     getMachineElement().appendChild(jsonToHtml(machine));
-    console.log(JSON.stringify(machine, null, 4));
+    //console.log(JSON.stringify(machine, null, 4));
 }
 
 function countLocation(text : string) : { line : number, row : number }
