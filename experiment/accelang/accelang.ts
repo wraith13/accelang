@@ -762,7 +762,7 @@ module accelang
         async typeValidation(codepath : string[], code : object) : Promise<object>
         {
             await this.waitEmbeddedLoaded();
-            let result = { };
+            let result : object = null;
             const type = code["&A"];
             if (undefined === type || null === type)
             {
@@ -784,11 +784,11 @@ module accelang
     //                    return call(code, context);
     
                     case "error":
-                        result = code;
+                        //result = code;
                         break;
     
                     case "file":
-                        result = code["code"];
+                        //result = code["code"];
                         //objectAssign(this.codeCursorMap, code["codeLocationMap"]);
                         break;
     
@@ -828,6 +828,12 @@ module accelang
             //  エラーを検出しても可能な限り最後まで処理を行う。
             //  この関数では例えそれが定数であっても評価は一切しない。(というかこの関数の処理が完了するまでは定数を評価する為に必要なコードやデータがアクセス可能な状態になっている保証がない。)
     
+            let typeError = await this.typeValidation(codepath, code);
+            if (typeError)
+            {
+                return typeError;
+            }
+
             let result = { };
             const type = code["&A"];
             if (undefined === type || null === type)
