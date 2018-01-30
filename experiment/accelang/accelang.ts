@@ -834,59 +834,26 @@ module accelang
                 return typeError;
             }
 
-            let result = { };
+            let result = code;
             const type = code["&A"];
-            if (undefined === type || null === type)
+            switch(practicalTypeof(type))
             {
-                result = this.makeError
-                (
-                    "format error(missing type)",
-                    code,
-                    codepath
-                );
-            }
-            else
-            {
-                switch(practicalTypeof(type))
+            case "string":
+                switch(type)
                 {
-                case "string":
-                    switch(type)
-                    {
-    //                case "call":
-    //                    return call(code, context);
-    
-                    case "error":
-                        result = code;
-                        break;
-    
-                    case "file":
-                        result = code["code"];
-                        objectAssign(this.codeCursorMap, code["codeLocationMap"]);
-                        break;
-    
-                    default:
-                        result = this.makeError
-                        (
-                            `uknown type error: ${type}`,
-                            code,
-                            codepath.concat("&A")
-                        );
-                    }
+//                case "call":
+//                    return call(code, context);
+                case "file":
+                    result = code["code"];
+                    objectAssign(this.codeCursorMap, code["codeLocationMap"]);
                     break;
-                    
-                case "object":
-                    {
-                        //const complex_type = accelang.evaluate(type);
-                        break;
-                    }
-    
-                default:
-                    result = this.makeError
-                    (
-                        `format error(invalid type): ${practicalTypeof(type)}, ${JSON.stringify(type)}`,
-                        code,
-                        codepath.concat("&A")
-                    );
+                }
+                break;
+                
+            case "object":
+                {
+                    //const complex_type = accelang.evaluate(type);
+                    break;
                 }
             }
             return result;
