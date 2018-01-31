@@ -713,6 +713,7 @@ module accelang
             setTimeout(async () => {
                 this.embedded = parseFile(filepath, await httpGet(filepath));
                 this.onEmbeddedLoaded.forEach(f => f());
+                this.onEmbeddedLoaded = [];
             }, 0);
         }
         async waitEmbeddedLoaded() : Promise<void>
