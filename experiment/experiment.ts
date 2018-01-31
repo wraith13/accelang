@@ -335,6 +335,7 @@ async function run() : Promise<void>
     };
     try
     {
+        await machine.init();
         getOutputElement().appendChild
         (
             jsonToHtml

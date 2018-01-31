@@ -700,38 +700,18 @@ module accelang
         codeCursorMap : { [name: string] : AmpCodeCursor } = {};
         embedded : object = null;
 
-        onEmbeddedLoaded : (() => void)[] = [];
-
         log : (text : string) => void = (text : string) => console.log(text);
         error : (text : string) => void = (text : string) => console.error(text);
             
         constructor(version : AmpVersion | null = null)
         {
             this.version = version;
-            
-            const filepath = "./accelang/syntax.json";
-            setTimeout(async () => {
-                this.embedded = parseFile(filepath, await httpGet(filepath));
-                this.onEmbeddedLoaded.forEach(f => f());
-                this.onEmbeddedLoaded = [];
-            }, 0);
         }
-        async waitEmbeddedLoaded() : Promise<void>
+
+        async init() : Promise<void>
         {
-            return new Promise<void>
-            (
-                (resolve) =>
-                {
-                    if (this.embedded)
-                    {
-                        resolve();
-                    }
-                    else
-                    {
-                        this.onEmbeddedLoaded.push(resolve);
-                    }
-                }
-            );
+            const filepath = "./accelang/syntax.json";
+            this.embedded = parseFile(filepath, await httpGet(filepath));
         }
 
         makeError(message : string, code : object = null, codepath : string[] = null) : object
@@ -762,7 +742,6 @@ module accelang
 
         async typeValidation(codepath : string[], code : object) : Promise<object>
         {
-            await this.waitEmbeddedLoaded();
             let result : object = null;
             const type = code["&A"];
             if (undefined === type || null === type)
@@ -823,7 +802,6 @@ module accelang
 
         async loadCore(codepath : string[], code : object) : Promise<object>
         {
-            await this.waitEmbeddedLoaded();
             //  この関数の役割は全てのコードおよびデータをコードからアクセス可能な状態にすること。
             //  シンタックスエラーの類いの検出はこの関数内で行ってしまう。
             //  エラーを検出しても可能な限り最後まで処理を行う。
@@ -862,7 +840,6 @@ module accelang
     
         async preload(filepath : string, code : string) : Promise<object>
         {
-            await this.waitEmbeddedLoaded();
             //  ここでは function が使える状態にしさえすればいいので load よりは少ない処理で済ませられるかもしれないがとりあえずいまは load に丸投げ。
             return await this.loadCore
             (
@@ -872,13 +849,11 @@ module accelang
         }
         async preprocess(code : object, _context : AmpMachine = null) : Promise<object>
         {
-            await this.waitEmbeddedLoaded();
             return code;
         }
     
         async load(filepath : string, code : string) : Promise<AmpMachine>
         {
-            await this.waitEmbeddedLoaded();
             this.code.push
             (
                 await this.loadCore
@@ -899,8 +874,6 @@ module accelang
         }
         async evaluate(code : object) : Promise<object>
         {
-            await this.waitEmbeddedLoaded();
-
             if ("array" === practicalTypeof(code))
             {
                 return await Promise.all((<Array<object>>code).map(async i => await this.evaluate(i)));
