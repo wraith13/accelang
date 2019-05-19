@@ -190,14 +190,14 @@ function arrayToHtml(array : object[]): HTMLElement
         const children : HTMLElement[] = [];
         for(var i = 0; i < array.length; ++i) {
             const item : HTMLElement[] = [anyToHtml(array[i])];
-            children.push(createDiv("item",　item));
+            children.push(createDiv("item", item));
         }
         const element = createDiv
         (
             "array",
             [
                 begin,
-                createDiv("list",　children),
+                createDiv("list", children),
                 end,
                 makeCommaSeperator()
             ]
@@ -223,7 +223,7 @@ function arrayToHtml(array : object[]): HTMLElement
 function objectToHtml(obj : object): HTMLElement
 {
     const items : HTMLElement[][] = [];
-    const begin = createDiv("begin",　"{");
+    const begin = createDiv("begin", "{");
     const end = createDiv("end",　"}");
     for(var key in obj)
     {
